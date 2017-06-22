@@ -233,6 +233,40 @@ func verifyFakeContainerList(fakeRuntime *apitest.FakeRuntimeService, expected [
 	return actual, reflect.DeepEqual(expected, actual)
 }
 
+type containerRecord struct {
+	container *v1.Container
+	attempt   uint32
+	state     runtimeapi.ContainerState
+}
+
+// Only extract the fields of interests.
+type cRecord struct {
+	name    string
+	attempt uint32
+	state   runtimeapi.ContainerState
+}
+
+type cRecordList []*cRecord
+
+func (b cRecordList) Len() int      { return len(b) }
+func (b cRecordList) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+func (b cRecordList) Less(i, j int) bool {
+	if b[i].name != b[j].name {
+		return b[i].name < b[j].name
+	}
+	return b[i].attempt < b[j].attempt
+}
+
+func verifyContainerStatuses(t *testing.T, runtime *apitest.FakeRuntimeService, expected []*cRecord, desc string) {
+	actual := []*cRecord{}
+	for _, cStatus := range runtime.Containers {
+		actual = append(actual, &cRecord{name: cStatus.Metadata.Name, attempt: cStatus.Metadata.Attempt, state: cStatus.State})
+	}
+	sort.Sort(cRecordList(expected))
+	sort.Sort(cRecordList(actual))
+	assert.Equal(t, expected, actual, desc)
+}
+
 func TestNewKubeRuntimeManager(t *testing.T) {
 	_, _, _, err := createTestRuntimeManager()
 	assert.NoError(t, err)
@@ -631,18 +665,6 @@ func TestSyncPodWithInitContainers(t *testing.T) {
 		},
 	}
 
-	// buildContainerID is an internal helper function to build container id from api pod
-	// and container with default attempt number 0.
-	buildContainerID := func(pod *v1.Pod, container v1.Container) string {
-		uid := string(pod.UID)
-		sandboxID := apitest.BuildSandboxName(&runtimeapi.PodSandboxMetadata{
-			Name:      pod.Name,
-			Uid:       uid,
-			Namespace: pod.Namespace,
-		})
-		return apitest.BuildContainerName(&runtimeapi.ContainerMetadata{Name: container.Name}, sandboxID)
-	}
-
 	backOff := flowcontrol.NewBackOff(time.Second, time.Minute)
 
 	// 1. should only create the init container.
@@ -650,36 +672,55 @@ func TestSyncPodWithInitContainers(t *testing.T) {
 	assert.NoError(t, err)
 	result := m.SyncPod(pod, v1.PodStatus{}, podStatus, []v1.Secret{}, backOff)
 	assert.NoError(t, result.Error())
-	assert.Equal(t, 1, len(fakeRuntime.Containers))
-	initContainerID := buildContainerID(pod, initContainers[0])
-	expectedContainers := []string{initContainerID}
-	if actual, ok := verifyFakeContainerList(fakeRuntime, expectedContainers); !ok {
-		t.Errorf("expected %q, got %q", expectedContainers, actual)
+	expected := []*cRecord{
+		{name: initContainers[0].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_RUNNING},
 	}
+	verifyContainerStatuses(t, fakeRuntime, expected, "start only the init container")
 
 	// 2. should not create app container because init container is still running.
 	podStatus, err = m.GetPodStatus(pod.UID, pod.Name, pod.Namespace)
 	assert.NoError(t, err)
 	result = m.SyncPod(pod, v1.PodStatus{}, podStatus, []v1.Secret{}, backOff)
 	assert.NoError(t, result.Error())
-	assert.Equal(t, 1, len(fakeRuntime.Containers))
-	expectedContainers = []string{initContainerID}
-	if actual, ok := verifyFakeContainerList(fakeRuntime, expectedContainers); !ok {
-		t.Errorf("expected %q, got %q", expectedContainers, actual)
-	}
+	verifyContainerStatuses(t, fakeRuntime, expected, "init container still running; do nothing")
 
 	// 3. should create all app containers because init container finished.
-	fakeRuntime.StopContainer(initContainerID, 0)
+	// Stop init container instance 0.
+	sandboxIDs, err := m.getSandboxIDByPodUID(pod.UID, nil)
+	require.NoError(t, err)
+	sandboxID := sandboxIDs[0]
+	initID0, err := fakeRuntime.GetContainerID(sandboxID, initContainers[0].Name, 0)
+	require.NoError(t, err)
+	fakeRuntime.StopContainer(initID0, 0)
+	// Sync again.
 	podStatus, err = m.GetPodStatus(pod.UID, pod.Name, pod.Namespace)
 	assert.NoError(t, err)
 	result = m.SyncPod(pod, v1.PodStatus{}, podStatus, []v1.Secret{}, backOff)
 	assert.NoError(t, result.Error())
-	assert.Equal(t, 3, len(fakeRuntime.Containers))
-	expectedContainers = []string{initContainerID, buildContainerID(pod, containers[0]),
-		buildContainerID(pod, containers[1])}
-	if actual, ok := verifyFakeContainerList(fakeRuntime, expectedContainers); !ok {
-		t.Errorf("expected %q, got %q", expectedContainers, actual)
+	expected = []*cRecord{
+		{name: initContainers[0].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_EXITED},
+		{name: containers[0].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_RUNNING},
+		{name: containers[1].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_RUNNING},
 	}
+	verifyContainerStatuses(t, fakeRuntime, expected, "init container completed; all app containers should be running")
+
+	// 4. should restart the init container if needed to create a new podsandbox
+	// Stop the pod sandbox.
+	fakeRuntime.StopPodSandbox(sandboxID)
+	// Sync again.
+	podStatus, err = m.GetPodStatus(pod.UID, pod.Name, pod.Namespace)
+	assert.NoError(t, err)
+	result = m.SyncPod(pod, v1.PodStatus{}, podStatus, []v1.Secret{}, backOff)
+	assert.NoError(t, result.Error())
+	expected = []*cRecord{
+		// The first init container instance is purged and no longer visible.
+		// The second (attempt == 1) instance has been started and is running.
+		{name: initContainers[0].Name, attempt: 1, state: runtimeapi.ContainerState_CONTAINER_RUNNING},
+		// All containers are killed.
+		{name: containers[0].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_EXITED},
+		{name: containers[1].Name, attempt: 0, state: runtimeapi.ContainerState_CONTAINER_EXITED},
+	}
+	verifyContainerStatuses(t, fakeRuntime, expected, "kill all app containers, purge the existing init container, and restart a new one")
 }
 
 // A helper function to get a basic pod and its status assuming all sandbox and
