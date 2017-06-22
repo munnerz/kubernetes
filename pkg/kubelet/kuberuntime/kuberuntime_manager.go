@@ -398,7 +398,7 @@ func shouldRestartOnFailure(pod *v1.Pod) bool {
 	return pod.Spec.RestartPolicy != v1.RestartPolicyNever
 }
 
-// computePodContainerChanges checks whether the pod spec has changed and returns the changes if true.
+// computePodActions checks whether the pod spec has changed and returns the changes if true.
 func (m *kubeGenericRuntimeManager) computePodActions(pod *v1.Pod, podStatus *kubecontainer.PodStatus) podActions {
 	glog.V(5).Infof("Syncing Pod %q: %+v", format.Pod(pod), pod)
 
@@ -469,7 +469,7 @@ func (m *kubeGenericRuntimeManager) computePodActions(pod *v1.Pod, podStatus *ku
 			restart = true
 		} else if liveness, found := m.livenessManager.Get(containerStatus.ID); found && liveness == proberesults.Failure {
 			// If the container failed the liveness probe, we should kill it.
-			reason = "container failed liveness probe."
+			reason = "Container failed liveness probe."
 		} else {
 			// Keep the container.
 			keepCount += 1
