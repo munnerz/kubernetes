@@ -32,8 +32,14 @@ ENV KUBE_CROSSPLATFORMS \
   darwin/amd64 darwin/386 \
   windows/amd64 windows/386
 
+RUN ARCH="$(uname -m)" && \
+    [ "${ARCH}" = "x86_64" ] || \
+    [ "${ARCH}" = "aarch64" ] || \
+    [ "${ARCH}" = "ppc64le" ] || \
+    ( echo "Unsupported architecture: ${ARCH}" && return 1 );
+
 # Pre-compile the standard go library when cross-compiling. This is much easier now when we have go1.5+
-RUN for platform in ${KUBE_CROSSPLATFORMS}; do GOOS=${platform%/*} GOARCH=${platform##*/} go install std; done \
+RUN ([ "$(uname -m)" = "x86_64" ] && for platform in ${KUBE_CROSSPLATFORMS}; do GOOS=${platform%/*} GOARCH=${platform##*/} go install std; done || true) \
     && go clean -cache
 
 # Install g++, then download and install protoc for generating protobuf output
@@ -43,14 +49,18 @@ RUN apt-get update \
 
 # Use dynamic cgo linking for architectures other than amd64 for the server platforms
 # To install crossbuild essential for other architectures add the following repository.
-RUN echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list.d/cgocrosscompiling.list \
+# NOTE: we are not going to support cross-build from arm64 and ppc64le to other architectures
+RUN echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list.d/cgocrosscompiling.list \
   && apt-key adv --no-tty --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5 3B4FE6ACC0B21F32 \
   && apt-get update \
   && apt-get install -y build-essential \
-  && for platform in ${KUBE_DYNAMIC_CROSSPLATFORMS}; do apt-get install -y crossbuild-essential-${platform}; done \
+  && ([ "$(uname -m)" = "x86_64" ] && for platform in ${KUBE_DYNAMIC_CROSSPLATFORMS}; do apt-get install -y crossbuild-essential-${platform}; done || true) \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN PROTOBUF_VERSION=3.0.2; ZIPNAME="protoc-${PROTOBUF_VERSION}-linux-x86_64.zip"; \
+RUN PROTOBUF_VERSION=3.7.0; \
+  [ "$(uname -m)" = "x86_64" ] && ZIPNAME="protoc-${PROTOBUF_VERSION}-linux-x86_64.zip" || true; \
+  [ "$(uname -m)" = "aarch64" ] && ZIPNAME="protoc-${PROTOBUF_VERSION}-linux-aarch_64.zip" || true; \
+  [ "$(uname -m)" = "ppc64le" ] && ZIPNAME="protoc-${PROTOBUF_VERSION}-linux-ppcle_64.zip" || true; \
   mkdir /tmp/protoc && cd /tmp/protoc \
   && wget "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF_VERSION}/${ZIPNAME}" \
   && unzip "${ZIPNAME}" \
@@ -73,7 +83,10 @@ RUN go get golang.org/x/tools/cmd/cover \
 
 # Download and symlink etcd. We need this for our integration tests.
 RUN export ETCD_VERSION=v3.2.24; \
+  [ "$(uname -m)" = "x86_64" ] && FILENAME="etcd-${ETCD_VERSION}-linux-amd64" || true; \
+  [ "$(uname -m)" = "aarch64" ] && FILENAME="etcd-${ETCD_VERSION}-linux-arm64" || true; \
+  [ "$(uname -m)" = "ppc64le" ] && FILENAME="etcd-${ETCD_VERSION}-linux-ppc64le" || true; \
   mkdir -p /usr/local/src/etcd \
   && cd /usr/local/src/etcd \
-  && curl -fsSL https://github.com/coreos/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz | tar -xz \
-  && ln -s ../src/etcd/etcd-${ETCD_VERSION}-linux-amd64/etcd /usr/local/bin/
+  && curl -fsSL https://github.com/coreos/etcd/releases/download/${ETCD_VERSION}/${FILENAME}.tar.gz | tar -xz \
+  && ln -s ../src/etcd/${FILENAME}/etcd /usr/local/bin/
