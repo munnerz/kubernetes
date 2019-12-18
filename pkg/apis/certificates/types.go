@@ -42,6 +42,22 @@ type CertificateSigningRequestSpec struct {
 	// Base64-encoded PKCS#10 CSR data
 	Request []byte
 
+	// Requested signer for the request.  It is a qualified name in the form: `scope-hostname.io/name`.
+	// If empty, it will be defaulted for v1beta1:
+	//  1. If it's a kubelet client certificate, it is assigned "kubernetes.io/kubelet-client".  This is determined by
+	//     Seeing if organizations are exactly `[]string{"system:nodes"}`, common name starts with `"system:node:"`, and
+	//     key usages are exactly `[]string{"key encipherment", "digital signature", "client auth"}`
+	//  2. Otherwise, it is assigned "kubernetes.io/legacy-unknown".
+	// In v1 it will be required.  Distribution of trust for signers happens out of band.
+	// that will be honored by the kube-controller-manager signer after approval.
+	//  1. kubernetes.io/kube-apiserver-client - signs certificates that will be honored as client-certs by the kube-apiserver. Never auto-approved by kube-controller-manager.
+	//  2. kubernetes.io/kubelet-client - signs client certificates that will be honored as client-certs by the kube-apiserver. May be auto-approved by kube-controller-manager.
+	//  3. kubernetes.io/kubelet-serving - signs serving certificates that are honored as a valid kubelet serving certificate by the kube-apiserver, but has no other guarantees.
+	//  4. kubernetes.io/legacy-unknown - has no guarantees for trust at all.  Some distributions may honor these as client certs, but that behavior is not standard kubernetes behavior.
+	// None of these usages are related to ServiceAccount token secrets `.data[ca.crt]` in any way.
+	// You can select on this field using `.spec.signerName`.
+	SignerName string
+
 	// usages specifies a set of usage contexts the key will be
 	// valid for.
 	// See: https://tools.ietf.org/html/rfc5280#section-4.2.1.3
