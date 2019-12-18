@@ -58,6 +58,9 @@ func ValidateCertificateSigningRequest(csr *certificates.CertificateSigningReque
 	if len(csr.Spec.Usages) == 0 {
 		allErrs = append(allErrs, field.Required(specPath.Child("usages"), "usages must be provided"))
 	}
+	if csr.Spec.SignerName == nil {
+		allErrs = append(allErrs, field.Required(specPath.Child("signerName"), "signerName must be provided"))
+	}
 	return allErrs
 }
 
