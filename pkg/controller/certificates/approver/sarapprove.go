@@ -170,6 +170,9 @@ var kubeletClientUsages = []capi.KeyUsage{
 }
 
 func isNodeClientCert(csr *capi.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
+	if csr.Spec.SignerName != "" && csr.Spec.SignerName != capi.KubeletClientSignerName {
+		return false
+	}
 	if !reflect.DeepEqual([]string{"system:nodes"}, x509cr.Subject.Organization) {
 		return false
 	}
