@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/klog"
 
+	"k8s.io/api/certificates/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -338,6 +339,7 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 			rbacv1helpers.NewRule("get", "list", "watch", "delete").Groups(certificatesGroup).Resources("certificatesigningrequests").RuleOrDie(),
 			rbacv1helpers.NewRule("update").Groups(certificatesGroup).Resources("certificatesigningrequests/status", "certificatesigningrequests/approval").RuleOrDie(),
 			rbacv1helpers.NewRule("create").Groups(authorizationGroup).Resources("subjectaccessreviews").RuleOrDie(),
+			rbacv1helpers.NewRule("create").Groups(authenticationGroup).Resources("certificatesigningrequests/approve/" + v1beta1.KubeletClientSignerName, "certificatesigningrequests/approve/" + v1beta1.LegacyUnknownSignerName).RuleOrDie(),
 			eventsRule(),
 		},
 	})
