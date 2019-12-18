@@ -22,6 +22,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	capi "k8s.io/api/certificates/v1beta1"
@@ -97,6 +98,9 @@ func newSigner(caFile, caKeyFile string, client clientset.Interface, certificate
 }
 
 func (s *signer) handle(csr *capi.CertificateSigningRequest) error {
+	if csr.Spec.SignerName != "" && !isKubernetesPrefixedSignerName(csr.Spec.SignerName) {
+		return nil
+	}
 	if !certificates.IsCertificateRequestApproved(csr) {
 		return nil
 	}
@@ -126,4 +130,8 @@ func (s *signer) sign(csr *capi.CertificateSigningRequest) (*capi.CertificateSig
 	}
 	csr.Status.Certificate = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
 	return csr, nil
+}
+
+func isKubernetesPrefixedSignerName(s string) bool {
+	return strings.HasPrefix(s, "kubernetes.io/")
 }
