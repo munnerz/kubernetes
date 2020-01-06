@@ -29,6 +29,8 @@ var Funcs = func(codecs runtimeserializer.CodecFactory) []interface{} {
 		func(obj *certificates.CertificateSigningRequestSpec, c fuzz.Continue) {
 			c.FuzzNoCustom(obj) // fuzz self without calling this function again
 			obj.Usages = []certificates.KeyUsage{certificates.UsageKeyEncipherment}
+			signerName := "custom-sample-signer"
+			obj.SignerName = &signerName
 		},
 	}
 }
