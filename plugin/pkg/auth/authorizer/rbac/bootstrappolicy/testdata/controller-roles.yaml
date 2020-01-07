@@ -102,6 +102,14 @@ items:
     verbs:
     - update
   - apiGroups:
+    - certificates.k8s.io
+    resourceNames:
+    - kubernetes.io/kubelet-client
+    resources:
+    - certificatesigners
+    verbs:
+    - approve
+  - apiGroups:
     - authorization.k8s.io
     resources:
     - subjectaccessreviews
