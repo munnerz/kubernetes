@@ -46,8 +46,40 @@ func SetDefaults_CertificateSigningRequestSpec(obj *certificatesv1beta1.Certific
 		} else if isKubeletClientCSR(csr, obj.Usages) {
 			signerName := certificatesv1beta1.KubeAPIServerClientKubeletSignerName
 			obj.SignerName = &signerName
+		} else if isKubeletServingCSR(obj, csr, obj.Usages) {
+			signerName := certificatesv1beta1.KubeletServingSignerName
+			obj.SignerName = &signerName
 		}
 	}
+}
+
+func isKubeletServingCSR(spec *certificatesv1beta1.CertificateSigningRequestSpec, req *x509.CertificateRequest, usages []certificatesv1beta1.KeyUsage) bool {
+	if !reflect.DeepEqual([]string{"system:nodes"}, req.Subject.Organization) {
+		return false
+	}
+
+	if len(req.DNSNames) == 0 || len(req.IPAddresses) == 0 {
+		return false
+	}
+
+	requiredUsages := []certificatesv1beta1.KeyUsage{
+		certificatesv1beta1.UsageDigitalSignature,
+		certificatesv1beta1.UsageKeyEncipherment,
+		certificatesv1beta1.UsageServerAuth,
+	}
+	if !equalUnsorted(requiredUsages, usages) {
+		return false
+	}
+
+	if !strings.HasPrefix(req.Subject.CommonName, "system:node:") {
+		return false
+	}
+
+	if spec.Username != req.Subject.CommonName {
+		return false
+	}
+
+	return true
 }
 
 func isKubeletClientCSR(req *x509.CertificateRequest, usages []certificatesv1beta1.KeyUsage) bool {
