@@ -18,7 +18,9 @@ package validation
 
 import (
 	"fmt"
+	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/certificates"
 	apivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
@@ -60,6 +62,24 @@ func ValidateCertificateSigningRequest(csr *certificates.CertificateSigningReque
 	}
 	if csr.Spec.SignerName == nil {
 		allErrs = append(allErrs, field.Required(specPath.Child("signerName"), "signerName must be provided"))
+	} else {
+		// ensure signerName is of the form domain.com/something and up to 571 characters
+		if len(*csr.Spec.SignerName) > 571 {
+			allErrs = append(allErrs, field.TooLong(specPath.Child("signerName"), *csr.Spec.SignerName, 571))
+		}
+		parts := strings.Split(*csr.Spec.SignerName, "/")
+		if len(parts) != 2 {
+			allErrs = append(allErrs, field.Invalid(specPath.Child("signerName"), *csr.Spec.SignerName, "must be a fully qualified domain of the form 'example.com/signer-name'"))
+		} else {
+			// check the domain portion to ensure it is a valid domain label
+			if errs := validation.NameIsDNSSubdomain(parts[0], false); errs != nil {
+				for _, err := range errs {
+					allErrs = append(allErrs, field.Invalid(specPath.Child("signerName"), *csr.Spec.SignerName, err))
+				}
+			}
+
+			// TODO: should we also validate the 'path' component?
+		}
 	}
 	return allErrs
 }
