@@ -24,7 +24,8 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/admit"
 	"k8s.io/kubernetes/plugin/pkg/admission/alwayspullimages"
 	"k8s.io/kubernetes/plugin/pkg/admission/antiaffinity"
-	"k8s.io/kubernetes/plugin/pkg/admission/certificates"
+	certapproval "k8s.io/kubernetes/plugin/pkg/admission/certificates/approval"
+	certsigning "k8s.io/kubernetes/plugin/pkg/admission/certificates/signing"
 	"k8s.io/kubernetes/plugin/pkg/admission/defaulttolerationseconds"
 	"k8s.io/kubernetes/plugin/pkg/admission/deny"
 	"k8s.io/kubernetes/plugin/pkg/admission/eventratelimit"
@@ -91,7 +92,8 @@ var AllOrderedPlugins = []string{
 	validatingwebhook.PluginName,            // ValidatingAdmissionWebhook
 	runtimeclass.PluginName,                 //RuntimeClass
 	resourcequota.PluginName,                // ResourceQuota
-	certificates.PluginName,                 // CertificateApproval
+	certapproval.PluginName,                 // CertificateApproval
+	certsigning.PluginName,                  // CertificateSigning
 	deny.PluginName,                         // AlwaysDeny
 }
 
@@ -126,7 +128,8 @@ func RegisterAllAdmissionPlugins(plugins *admission.Plugins) {
 	setdefault.Register(plugins)
 	resize.Register(plugins)
 	storageobjectinuseprotection.Register(plugins)
-	certificates.Register(plugins)
+	certapproval.Register(plugins)
+	certsigning.Register(plugins)
 }
 
 // DefaultOffAdmissionPlugins get admission plugins off by default for kube-apiserver.
@@ -145,7 +148,8 @@ func DefaultOffAdmissionPlugins() sets.String {
 		podpriority.PluginName,                  //PodPriority
 		nodetaint.PluginName,                    //TaintNodesByCondition
 		runtimeclass.PluginName,                 //RuntimeClass, gates internally on the feature
-		certificates.PluginName,                 //CertificateSigningRequest approval plugin
+		certapproval.PluginName,                 //CertificateSigningRequest approval plugin
+		certsigning.PluginName,                  //CertificateSigningRequest signing plugin
 	)
 
 	return sets.NewString(AllOrderedPlugins...).Difference(defaultOnPlugins)

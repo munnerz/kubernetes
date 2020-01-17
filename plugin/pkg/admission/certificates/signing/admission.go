@@ -14,12 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package certificates
+package signing
 
 import (
 	"context"
 	"fmt"
 	"io"
+	"reflect"
+	"strings"
 
 	"k8s.io/klog"
 
@@ -32,7 +34,7 @@ import (
 )
 
 // PluginName is a string with the name of the plugin
-const PluginName = "CertificateApproval"
+const PluginName = "CertificateSigning"
 
 // Register registers a plugin
 func Register(plugins *admission.Plugins) {
@@ -75,57 +77,88 @@ func newPlugin() *Plugin {
 func (p *Plugin) Validate(ctx context.Context, a admission.Attributes, o admission.ObjectInterfaces) error {
 	// Ignore all calls to anything other than 'certificatesigningrequests/approval'.
 	// Ignore all operations other than UPDATE.
-	if a.GetSubresource() != "approval" ||
+	if a.GetSubresource() != "status" ||
 		a.GetResource().GroupResource() != api.Resource("certificatesigningrequests") ||
 		a.GetOperation() != admission.Update {
 		return nil
 	}
 
+	oldCSR := a.GetOldObject().(*api.CertificateSigningRequest)
 	csr := a.GetObject().(*api.CertificateSigningRequest)
 
-	// if signerName is not set, the approving user must have permission to
-	// approve *all* signerNames (i.e. no 'resourceNames' attribute provided).
-	// TODO: should we apply defaulting logic here and test for legacy-unknown,
-	//  or alternatively always allow requests if the signerName is empty as it
-	//  implies we are speaking to a non-signerName aware client
-	signerName := ""
-	if csr.Spec.SignerName != nil {
-		signerName = *csr.Spec.SignerName
+	// only run if the status.certificate field has been changed
+	if reflect.DeepEqual(oldCSR.Status.Certificate, csr.Status.Certificate) {
+		return nil
 	}
 
-	if isAuthorizedForPolicy(ctx, a.GetUserInfo(), signerName, csr.Name, p.authz) {
+	// It is safe for us to dereference signerName because the defaulting logic will run before this admission
+	// controller is executed, meaning we know it is set even if an older client that is not aware of the signerName
+	// field is submitting the signed certificate.
+	signerName := *csr.Spec.SignerName
+
+	if isAuthorizedForPolicy(ctx, a.GetUserInfo(), signerName, p.authz) {
 		return nil
 	}
 
 	// we didn't validate against any provider, reject the pod and give the errors for each attempt
-	klog.V(4).Infof("user not permitted to approve CertificateSigningRequest %q with signerName %q", csr.Name, signerName)
-	return admission.NewForbidden(a, fmt.Errorf("user not permitted to approve requests with signerName %q", signerName))
+	klog.V(4).Infof("user not permitted to sign CertificateSigningRequest %q with signerName %q", csr.Name, signerName)
+	return admission.NewForbidden(a, fmt.Errorf("user not permitted to sign requests with signerName %q", signerName))
 }
 
-// isAuthorizedForPolicy returns true if info is authorized to perform the "approve" verb on the synthetic
-// 'certificatesigners' resource.
-func isAuthorizedForPolicy(ctx context.Context, info user.Info, signerName, csrName string, authz authorizer.Authorizer) bool {
+// isAuthorizedForPolicy returns true if info is authorized to perform the "sign" verb on the synthetic
+// 'signers' resource with the given signerName.
+// It will also check if the user has permission to perform the "sign" verb against the domain portion of
+// the signerName + /*, i.e. `kubernetes.io/*` iff the user doesn't have explicit permission on the named signer.
+func isAuthorizedForPolicy(ctx context.Context, info user.Info, signerName string, authz authorizer.Authorizer) bool {
 	if info == nil {
 		return false
 	}
+
+	// First check if the user has explicit permission to approve for the given signerName.
 	attr := buildAttributes(info, signerName)
 	decision, reason, err := authz.Authorize(ctx, attr)
 	if err != nil {
 		klog.V(5).Infof("cannot authorize for policy: %v,%v", reason, err)
+		return false
 	}
-	return (decision == authorizer.DecisionAllow)
+	if decision == authorizer.DecisionAllow {
+		return true
+	}
+
+	// If not, check if the user has wildcard permissions to approve for the domain portion of the signerName, e.g.
+	// 'kubernetes.io/*'.
+	attr = buildWildcardAttributes(info, signerName)
+	decision, reason, err = authz.Authorize(ctx, attr)
+	if err != nil {
+		klog.V(5).Infof("cannot authorize for policy: %v,%v", reason, err)
+		return false
+	}
+	if decision == authorizer.DecisionAllow {
+		return true
+	}
+
+	return false
 }
 
 // buildAttributes builds an attributes record for a SAR based on the user info and policy.
 func buildAttributes(info user.Info, signerName string) authorizer.Attributes {
-	attr := authorizer.AttributesRecord{
+	return buildAttributeRecord(info, signerName)
+}
+
+func buildWildcardAttributes(info user.Info, signerName string) authorizer.Attributes {
+	parts := strings.Split(signerName, "/")
+	domain := parts[0]
+	return buildAttributeRecord(info, domain+"/*")
+}
+
+func buildAttributeRecord(info user.Info, name string) authorizer.Attributes {
+	return authorizer.AttributesRecord{
 		User:            info,
-		Verb:            "approve",
-		Name:            signerName,
+		Verb:            "sign",
+		Name:            name,
 		APIGroup:        "certificates.k8s.io",
 		APIVersion:      "*",
-		Resource:        "certificatesigners",
+		Resource:        "signers",
 		ResourceRequest: true,
 	}
-	return attr
 }
