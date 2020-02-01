@@ -26,6 +26,7 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/antiaffinity"
 	certapproval "k8s.io/kubernetes/plugin/pkg/admission/certificates/approval"
 	certsigning "k8s.io/kubernetes/plugin/pkg/admission/certificates/signing"
+	certsubjectrestrictions "k8s.io/kubernetes/plugin/pkg/admission/certificates/subjectrestrictions"
 	"k8s.io/kubernetes/plugin/pkg/admission/defaulttolerationseconds"
 	"k8s.io/kubernetes/plugin/pkg/admission/deny"
 	"k8s.io/kubernetes/plugin/pkg/admission/eventratelimit"
@@ -94,6 +95,7 @@ var AllOrderedPlugins = []string{
 	resourcequota.PluginName,                // ResourceQuota
 	certapproval.PluginName,                 // CertificateApproval
 	certsigning.PluginName,                  // CertificateSigning
+	certsubjectrestrictions.PluginName,      // CertificateSubjectRestrictions
 	deny.PluginName,                         // AlwaysDeny
 }
 
@@ -130,6 +132,7 @@ func RegisterAllAdmissionPlugins(plugins *admission.Plugins) {
 	storageobjectinuseprotection.Register(plugins)
 	certapproval.Register(plugins)
 	certsigning.Register(plugins)
+	certsubjectrestrictions.Register(plugins)
 }
 
 // DefaultOffAdmissionPlugins get admission plugins off by default for kube-apiserver.
@@ -150,6 +153,7 @@ func DefaultOffAdmissionPlugins() sets.String {
 		runtimeclass.PluginName,                 //RuntimeClass, gates internally on the feature
 		certapproval.PluginName,                 //CertificateSigningRequest approval plugin
 		certsigning.PluginName,                  //CertificateSigningRequest signing plugin
+		certsubjectrestrictions.PluginName,      //CertificateSigningRequest subject restrictions plugin
 	)
 
 	return sets.NewString(AllOrderedPlugins...).Difference(defaultOnPlugins)
