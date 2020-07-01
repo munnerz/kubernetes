@@ -205,6 +205,8 @@ github.com/coreos/pkg/capnslog
 github.com/coreos/pkg/dlopen
 # github.com/cpuguy83/go-md2man v1.0.10 => github.com/cpuguy83/go-md2man v1.0.10
 github.com/cpuguy83/go-md2man/md2man
+# github.com/cpuguy83/go-md2man/v2 v2.0.0 => github.com/cpuguy83/go-md2man/v2 v2.0.0
+github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/cyphar/filepath-securejoin v0.2.2 => github.com/cyphar/filepath-securejoin v0.2.2
 github.com/cyphar/filepath-securejoin
 # github.com/davecgh/go-spew v1.1.1 => github.com/davecgh/go-spew v1.1.1
@@ -652,10 +654,14 @@ github.com/robfig/cron
 github.com/rubiojr/go-vhd/vhd
 # github.com/russross/blackfriday v1.5.2 => github.com/russross/blackfriday v1.5.2
 github.com/russross/blackfriday
+# github.com/russross/blackfriday/v2 v2.0.1 => github.com/russross/blackfriday/v2 v2.0.1
+github.com/russross/blackfriday/v2
 # github.com/satori/go.uuid v1.2.0 => github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
 # github.com/seccomp/libseccomp-golang v0.9.1 => github.com/seccomp/libseccomp-golang v0.9.1
 github.com/seccomp/libseccomp-golang
+# github.com/shurcooL/sanitized_anchor_name v1.0.0 => github.com/shurcooL/sanitized_anchor_name v1.0.0
+github.com/shurcooL/sanitized_anchor_name
 # github.com/sirupsen/logrus v1.4.2 => github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
 # github.com/soheilhy/cmux v0.1.4 => github.com/soheilhy/cmux v0.1.4
@@ -665,14 +671,14 @@ github.com/spf13/afero
 github.com/spf13/afero/mem
 # github.com/spf13/cast v1.3.0 => github.com/spf13/cast v1.3.0
 github.com/spf13/cast
-# github.com/spf13/cobra v0.0.5 => github.com/spf13/cobra v0.0.5
+# github.com/spf13/cobra v1.0.0 => github.com/spf13/cobra v1.0.0
 github.com/spf13/cobra
 github.com/spf13/cobra/doc
 # github.com/spf13/jwalterweatherman v1.1.0 => github.com/spf13/jwalterweatherman v1.1.0
 github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5 => github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/spf13/viper v1.3.2 => github.com/spf13/viper v1.3.2
+# github.com/spf13/viper v1.4.0 => github.com/spf13/viper v1.3.2
 github.com/spf13/viper
 # github.com/storageos/go-api v0.0.0-20180912212459-343b3eff91fc => github.com/storageos/go-api v0.0.0-20180912212459-343b3eff91fc
 github.com/storageos/go-api
