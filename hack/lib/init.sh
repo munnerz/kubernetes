@@ -113,6 +113,7 @@ rbac.authorization.k8s.io/v1alpha1 \
 scheduling.k8s.io/v1alpha1 \
 scheduling.k8s.io/v1beta1 \
 scheduling.k8s.io/v1 \
+scopes.k8s.io/v1alpha1 \
 storage.k8s.io/v1beta1 \
 storage.k8s.io/v1 \
 storage.k8s.io/v1alpha1 \
