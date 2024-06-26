@@ -64,6 +64,7 @@ import (
 	schedulingv1 "k8s.io/api/scheduling/v1"
 	schedulingv1alpha1 "k8s.io/api/scheduling/v1alpha1"
 	schedulingv1beta1 "k8s.io/api/scheduling/v1beta1"
+	scopesv1alpha1 "k8s.io/api/scopes/v1alpha1"
 	storagev1 "k8s.io/api/storage/v1"
 	storagev1alpha1 "k8s.io/api/storage/v1alpha1"
 	storagev1beta1 "k8s.io/api/storage/v1beta1"
@@ -118,6 +119,7 @@ import (
 	applyconfigurationsschedulingv1 "k8s.io/client-go/applyconfigurations/scheduling/v1"
 	applyconfigurationsschedulingv1alpha1 "k8s.io/client-go/applyconfigurations/scheduling/v1alpha1"
 	applyconfigurationsschedulingv1beta1 "k8s.io/client-go/applyconfigurations/scheduling/v1beta1"
+	applyconfigurationsscopesv1alpha1 "k8s.io/client-go/applyconfigurations/scopes/v1alpha1"
 	applyconfigurationsstoragev1 "k8s.io/client-go/applyconfigurations/storage/v1"
 	applyconfigurationsstoragev1alpha1 "k8s.io/client-go/applyconfigurations/storage/v1alpha1"
 	applyconfigurationsstoragev1beta1 "k8s.io/client-go/applyconfigurations/storage/v1beta1"
@@ -1640,6 +1642,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		// Group=scheduling.k8s.io, Version=v1beta1
 	case schedulingv1beta1.SchemeGroupVersion.WithKind("PriorityClass"):
 		return &applyconfigurationsschedulingv1beta1.PriorityClassApplyConfiguration{}
+
+		// Group=scopes.k8s.io, Version=v1alpha1
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinition"):
+		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinitionSpec"):
+		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionSpecApplyConfiguration{}
 
 		// Group=storage.k8s.io, Version=v1
 	case storagev1.SchemeGroupVersion.WithKind("CSIDriver"):

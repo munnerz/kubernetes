@@ -45,6 +45,7 @@ import (
 	rbac "k8s.io/client-go/informers/rbac"
 	resource "k8s.io/client-go/informers/resource"
 	scheduling "k8s.io/client-go/informers/scheduling"
+	scopes "k8s.io/client-go/informers/scopes"
 	storage "k8s.io/client-go/informers/storage"
 	storagemigration "k8s.io/client-go/informers/storagemigration"
 	kubernetes "k8s.io/client-go/kubernetes"
@@ -291,6 +292,7 @@ type SharedInformerFactory interface {
 	Rbac() rbac.Interface
 	Resource() resource.Interface
 	Scheduling() scheduling.Interface
+	Scopes() scopes.Interface
 	Storage() storage.Interface
 	Storagemigration() storagemigration.Interface
 }
@@ -365,6 +367,10 @@ func (f *sharedInformerFactory) Resource() resource.Interface {
 
 func (f *sharedInformerFactory) Scheduling() scheduling.Interface {
 	return scheduling.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Scopes() scopes.Interface {
+	return scopes.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Storage() storage.Interface {

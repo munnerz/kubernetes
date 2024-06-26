@@ -933,6 +933,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/scheduling/v1alpha1.PriorityClassList":                                                      schema_k8sio_api_scheduling_v1alpha1_PriorityClassList(ref),
 		"k8s.io/api/scheduling/v1beta1.PriorityClass":                                                           schema_k8sio_api_scheduling_v1beta1_PriorityClass(ref),
 		"k8s.io/api/scheduling/v1beta1.PriorityClassList":                                                       schema_k8sio_api_scheduling_v1beta1_PriorityClassList(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeDefinition":                                                            schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionList":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref),
 		"k8s.io/api/storage/v1.CSIDriver":                                                                       schema_k8sio_api_storage_v1_CSIDriver(ref),
 		"k8s.io/api/storage/v1.CSIDriverList":                                                                   schema_k8sio_api_storage_v1_CSIDriverList(ref),
 		"k8s.io/api/storage/v1.CSIDriverSpec":                                                                   schema_k8sio_api_storage_v1_CSIDriverSpec(ref),
@@ -47762,6 +47765,125 @@ func schema_k8sio_api_scheduling_v1beta1_PriorityClassList(ref common.ReferenceC
 		},
 		Dependencies: []string{
 			"k8s.io/api/scheduling/v1beta1.PriorityClass", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ScopeDefinition is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `scope.k8s.io/workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ScopeDefinitionList is a collection of ScopeDefinition objects.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/scopes/v1alpha1.ScopeDefinition"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/scopes/v1alpha1.ScopeDefinition", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespaces": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespaces is the list of namespaces currently contained within this scope.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
 

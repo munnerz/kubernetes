@@ -123,6 +123,8 @@ import (
 	fakeschedulingv1alpha1 "k8s.io/client-go/kubernetes/typed/scheduling/v1alpha1/fake"
 	schedulingv1beta1 "k8s.io/client-go/kubernetes/typed/scheduling/v1beta1"
 	fakeschedulingv1beta1 "k8s.io/client-go/kubernetes/typed/scheduling/v1beta1/fake"
+	scopesv1alpha1 "k8s.io/client-go/kubernetes/typed/scopes/v1alpha1"
+	fakescopesv1alpha1 "k8s.io/client-go/kubernetes/typed/scopes/v1alpha1/fake"
 	storagev1 "k8s.io/client-go/kubernetes/typed/storage/v1"
 	fakestoragev1 "k8s.io/client-go/kubernetes/typed/storage/v1/fake"
 	storagev1alpha1 "k8s.io/client-go/kubernetes/typed/storage/v1alpha1"
@@ -463,6 +465,11 @@ func (c *Clientset) SchedulingV1beta1() schedulingv1beta1.SchedulingV1beta1Inter
 // SchedulingV1 retrieves the SchedulingV1Client
 func (c *Clientset) SchedulingV1() schedulingv1.SchedulingV1Interface {
 	return &fakeschedulingv1.FakeSchedulingV1{Fake: &c.Fake}
+}
+
+// ScopesV1alpha1 retrieves the ScopesV1alpha1Client
+func (c *Clientset) ScopesV1alpha1() scopesv1alpha1.ScopesV1alpha1Interface {
+	return &fakescopesv1alpha1.FakeScopesV1alpha1{Fake: &c.Fake}
 }
 
 // StorageV1beta1 retrieves the StorageV1beta1Client

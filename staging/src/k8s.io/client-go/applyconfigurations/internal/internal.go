@@ -12768,6 +12768,32 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: numeric
       default: 0
+- name: io.k8s.api.scopes.v1alpha1.ScopeDefinition
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
+      default: {}
+- name: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
+  map:
+    fields:
+    - name: namespaces
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
 - name: io.k8s.api.storage.v1.CSIDriver
   map:
     fields:

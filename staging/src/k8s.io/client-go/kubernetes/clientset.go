@@ -72,6 +72,7 @@ import (
 	schedulingv1 "k8s.io/client-go/kubernetes/typed/scheduling/v1"
 	schedulingv1alpha1 "k8s.io/client-go/kubernetes/typed/scheduling/v1alpha1"
 	schedulingv1beta1 "k8s.io/client-go/kubernetes/typed/scheduling/v1beta1"
+	scopesv1alpha1 "k8s.io/client-go/kubernetes/typed/scopes/v1alpha1"
 	storagev1 "k8s.io/client-go/kubernetes/typed/storage/v1"
 	storagev1alpha1 "k8s.io/client-go/kubernetes/typed/storage/v1alpha1"
 	storagev1beta1 "k8s.io/client-go/kubernetes/typed/storage/v1beta1"
@@ -131,6 +132,7 @@ type Interface interface {
 	SchedulingV1alpha1() schedulingv1alpha1.SchedulingV1alpha1Interface
 	SchedulingV1beta1() schedulingv1beta1.SchedulingV1beta1Interface
 	SchedulingV1() schedulingv1.SchedulingV1Interface
+	ScopesV1alpha1() scopesv1alpha1.ScopesV1alpha1Interface
 	StorageV1beta1() storagev1beta1.StorageV1beta1Interface
 	StorageV1() storagev1.StorageV1Interface
 	StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface
@@ -189,6 +191,7 @@ type Clientset struct {
 	schedulingV1alpha1            *schedulingv1alpha1.SchedulingV1alpha1Client
 	schedulingV1beta1             *schedulingv1beta1.SchedulingV1beta1Client
 	schedulingV1                  *schedulingv1.SchedulingV1Client
+	scopesV1alpha1                *scopesv1alpha1.ScopesV1alpha1Client
 	storageV1beta1                *storagev1beta1.StorageV1beta1Client
 	storageV1                     *storagev1.StorageV1Client
 	storageV1alpha1               *storagev1alpha1.StorageV1alpha1Client
@@ -438,6 +441,11 @@ func (c *Clientset) SchedulingV1beta1() schedulingv1beta1.SchedulingV1beta1Inter
 // SchedulingV1 retrieves the SchedulingV1Client
 func (c *Clientset) SchedulingV1() schedulingv1.SchedulingV1Interface {
 	return c.schedulingV1
+}
+
+// ScopesV1alpha1 retrieves the ScopesV1alpha1Client
+func (c *Clientset) ScopesV1alpha1() scopesv1alpha1.ScopesV1alpha1Interface {
+	return c.scopesV1alpha1
 }
 
 // StorageV1beta1 retrieves the StorageV1beta1Client
@@ -700,6 +708,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+	cs.scopesV1alpha1, err = scopesv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.storageV1beta1, err = storagev1beta1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -786,6 +798,7 @@ func New(c rest.Interface) *Clientset {
 	cs.schedulingV1alpha1 = schedulingv1alpha1.New(c)
 	cs.schedulingV1beta1 = schedulingv1beta1.New(c)
 	cs.schedulingV1 = schedulingv1.New(c)
+	cs.scopesV1alpha1 = scopesv1alpha1.New(c)
 	cs.storageV1beta1 = storagev1beta1.New(c)
 	cs.storageV1 = storagev1.New(c)
 	cs.storageV1alpha1 = storagev1alpha1.New(c)
