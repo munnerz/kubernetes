@@ -59,6 +59,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic"
+	"k8s.io/apiserver/pkg/scopes"
 	"k8s.io/apiserver/pkg/server/dynamiccertificates"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	genericfilters "k8s.io/apiserver/pkg/server/filters"
@@ -314,6 +315,10 @@ type Config struct {
 	// This grace period is orthogonal to other grace periods, and
 	// it is not overridden by any other grace period.
 	ShutdownWatchTerminationGracePeriod time.Duration
+
+	// ScopeResolver, if set, is used to resolve 'scope' query parameters
+	// into sets of namespaces that a request should apply to.
+	ScopeResolver scopes.ScopeResolver
 }
 
 type RecommendedConfig struct {
@@ -1063,6 +1068,10 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	// after WithPanicRecover() to be protected from panics.
 	if c.FeatureGate.Enabled(genericfeatures.APIServingWithRoutine) {
 		handler = routine.WithRoutine(handler, c.LongRunningFunc)
+	}
+	if c.FeatureGate.Enabled(genericfeatures.RequestScoping) {
+		handler = genericapifilters.WithScopeResolver(handler, c.ScopeResolver)
+		handler = genericapifilters.WithScope(handler, c.Serializer)
 	}
 	handler = genericapifilters.WithRequestInfo(handler, c.RequestInfoResolver)
 	handler = genericapifilters.WithRequestReceivedTimestamp(handler)

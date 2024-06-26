@@ -41,6 +41,7 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/registry/rest"
+	"k8s.io/apiserver/pkg/scopes"
 	"k8s.io/apiserver/pkg/server/routine"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/tracing"
@@ -249,6 +250,25 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 				}
 			} else {
 				opts.FieldSelector = nameSelector
+			}
+		}
+
+		// Apply request scopes if the feature is enabled.
+		if utilfeature.DefaultFeatureGate.Enabled(features.RequestScoping) {
+			// handle scoped requests by converting them to LabelSelectors
+			if s, found := scopes.ScopeFrom(ctx); found {
+				if s.Identifier == "" {
+					// implies the scope hasn't been resolved, this shouldn't ever be reached as it should be caught
+					// by the http filter already
+					scope.err(errors.NewInternalError(fmt.Errorf("no scope value set on request context")), w, req)
+					return
+				}
+
+				opts.LabelSelector, err = scopingLabelSelector(s, opts.LabelSelector)
+				if err != nil {
+					scope.err(errors.NewInternalError(err), w, req)
+					return
+				}
 			}
 		}
 

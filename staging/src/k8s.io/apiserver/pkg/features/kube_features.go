@@ -284,6 +284,14 @@ const (
 	// the 'nominalConcurrencyShares' field of the 'limited' section of a
 	// priority level.
 	ZeroLimitedNominalConcurrencyShares featuregate.Feature = "ZeroLimitedNominalConcurrencyShares"
+
+	// owner: @munnerz
+	// alpha: v1.31
+	//
+	// Allow using the ?scope=X query parameter to offer a mechanism to scope
+	// cluster-scoped requests to a limited set of namespaces defined
+	// in ScopeDefinition objects.
+	RequestScoping featuregate.Feature = "RequestScoping"
 )
 
 func init() {
@@ -450,6 +458,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 	ZeroLimitedNominalConcurrencyShares: {
 		{Version: version.MustParse("1.29"), Default: false, PreRelease: featuregate.Beta},
 		{Version: version.MustParse("1.30"), Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	},
+
+	RequestScoping: {
+		{Version: version.MustParse("1.32"), Default: false, PreRelease: featuregate.Alpha},
 	},
 }
 
