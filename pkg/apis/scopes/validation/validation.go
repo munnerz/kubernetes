@@ -25,7 +25,7 @@ import (
 // ValidateScopeDefinition validate the storage version object.
 func ValidateScopeDefinition(sv *scopes.ScopeDefinition) field.ErrorList {
 	var allErrs field.ErrorList
-	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&sv.ObjectMeta, true, ValidateScopeDefinitionName, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&sv.ObjectMeta, false, ValidateScopeDefinitionName, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateScopeDefinitionSpec(sv.Spec, field.NewPath("spec"))...)
 	return allErrs
 }
