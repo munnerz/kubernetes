@@ -43,6 +43,7 @@ import (
 	rbacv1beta1 "k8s.io/api/rbac/v1beta1"
 	resourceapi "k8s.io/api/resource/v1alpha3"
 	schedulingv1 "k8s.io/api/scheduling/v1"
+	scopesv1alpha1 "k8s.io/api/scopes/v1alpha1"
 	storagev1 "k8s.io/api/storage/v1"
 	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,6 +73,7 @@ import (
 	"k8s.io/kubernetes/pkg/apis/rbac"
 	"k8s.io/kubernetes/pkg/apis/resource"
 	"k8s.io/kubernetes/pkg/apis/scheduling"
+	"k8s.io/kubernetes/pkg/apis/scopes"
 	"k8s.io/kubernetes/pkg/apis/storage"
 	storageutil "k8s.io/kubernetes/pkg/apis/storage/util"
 	svmv1alpha1 "k8s.io/kubernetes/pkg/apis/storagemigration"
@@ -699,6 +701,13 @@ func AddHandlers(h printers.PrintHandler) {
 	}
 	_ = h.TableHandler(storageVersionMigrationColumnDefinitions, printStorageVersionMigration)
 	_ = h.TableHandler(storageVersionMigrationColumnDefinitions, printStorageVersionMigrationList)
+
+	scopeDefinitionColumnDefinitions := []metav1.TableColumnDefinition{
+		{Name: "Name", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
+		{Name: "Namespaces", Type: "string", Description: scopesv1alpha1.ScopeDefinitionSpec{}.SwaggerDoc()["namespaces"]},
+	}
+	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScopeDefinition)
+	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScopeDefinitionList)
 }
 
 // Pass ports=nil for all ports.
@@ -3143,6 +3152,30 @@ func printStorageVersionMigrationList(list *svmv1alpha1.StorageVersionMigrationL
 
 	for i := range list.Items {
 		r, err := printStorageVersionMigration(&list.Items[i], options)
+		if err != nil {
+			return nil, err
+		}
+		rows = append(rows, r...)
+	}
+	return rows, nil
+}
+
+func printScopeDefinition(obj *scopes.ScopeDefinition, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	row := metav1.TableRow{
+		Object: runtime.RawExtension{Object: obj},
+	}
+
+	namespaces := strings.Join(obj.Spec.Namespaces, ", ")
+	row.Cells = append(row.Cells, obj.Name, namespaces)
+
+	return []metav1.TableRow{row}, nil
+}
+
+func printScopeDefinitionList(list *scopes.ScopeDefinitionList, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	rows := make([]metav1.TableRow, 0, len(list.Items))
+
+	for i := range list.Items {
+		r, err := printScopeDefinition(&list.Items[i], options)
 		if err != nil {
 			return nil, err
 		}

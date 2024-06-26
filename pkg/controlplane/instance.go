@@ -50,6 +50,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	resourceapi "k8s.io/api/resource/v1alpha3"
 	schedulingapiv1 "k8s.io/api/scheduling/v1"
+	scopesv1alpha1 "k8s.io/api/scopes/v1alpha1"
 	storageapiv1 "k8s.io/api/storage/v1"
 	storageapiv1alpha1 "k8s.io/api/storage/v1alpha1"
 	storageapiv1beta1 "k8s.io/api/storage/v1beta1"
@@ -99,6 +100,7 @@ import (
 	rbacrest "k8s.io/kubernetes/pkg/registry/rbac/rest"
 	resourcerest "k8s.io/kubernetes/pkg/registry/resource/rest"
 	schedulingrest "k8s.io/kubernetes/pkg/registry/scheduling/rest"
+	scopesrest "k8s.io/kubernetes/pkg/registry/scopes/rest"
 	storagerest "k8s.io/kubernetes/pkg/registry/storage/rest"
 	svmrest "k8s.io/kubernetes/pkg/registry/storagemigration/rest"
 )
@@ -425,6 +427,7 @@ func (c CompletedConfig) StorageProviders(discovery clientdiscovery.DiscoveryInt
 		admissionregistrationrest.RESTStorageProvider{Authorizer: c.ControlPlane.Generic.Authorization.Authorizer, DiscoveryClient: discovery},
 		eventsrest.RESTStorageProvider{TTL: c.ControlPlane.EventTTL},
 		resourcerest.RESTStorageProvider{},
+		scopesrest.RESTStorageProvider{},
 	}, nil
 }
 
@@ -475,6 +478,7 @@ var (
 		networkingapiv1alpha1.SchemeGroupVersion,
 		storageapiv1alpha1.SchemeGroupVersion,
 		svmv1alpha1.SchemeGroupVersion,
+		scopesv1alpha1.SchemeGroupVersion,
 	}
 )
 
