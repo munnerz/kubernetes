@@ -28,19 +28,33 @@ import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 // Package-wide variables from generator "generated".
 option go_package = "k8s.io/api/scopes/v1alpha1";
 
+// MinimumResourceVersion contains information about a scopes validity within a particular store.
+message MinimumResourceVersion {
+  // The ID of the storage backend in the API server.
+  optional string storeID = 1;
+
+  // ResourceVersion is the minimum supported resource version for this scope in the store.
+  optional string resourceVersion = 2;
+}
+
 // ScopeDefinition is a definition of a mapping between a scope (name, value) tuple
 // and a list of namespace names.
 // The metadata.namespace field is used to represent the scope name, and the
 // metadata.name field is used to represent the scope value.
 // For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace'
-// would correspond to the scope selector `scope.k8s.io/workspace=my-workspace`.
+// would correspond to the scope selector `workspace=my-workspace`.
 // A scopes generation field is used to uniquely identify a revision of a scope configuration.
 message ScopeDefinition {
   // Standard object's metadata.
+  // The name must be of the form `<scope-name>:<scope-value>`, for example: `workspaces:my-workspace`.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
+  // Specification of the ScopeDefinition.
   optional ScopeDefinitionSpec spec = 2;
+
+  // Status of the ScopeDefinition.
+  optional ScopeDefinitionStatus status = 3;
 }
 
 // ScopeDefinitionList is a collection of ScopeDefinition objects.
@@ -53,7 +67,52 @@ message ScopeDefinitionList {
 }
 
 message ScopeDefinitionSpec {
-  // Namespaces is the list of namespaces currently contained within this scope.
+  // Namespaces is a list of static & explicit namespace names to be included in the scope.
+  // +listType=set
   repeated string namespaces = 1;
+}
+
+message ScopeDefinitionStatus {
+  // ScopeID is a unique identifier for this generation/epoch of mapping.
+  optional string scopeID = 1;
+
+  // Namespaces is the final set of namespaces that are included within this scope.
+  // +listType=set
+  repeated string namespaces = 2;
+
+  // MinimumResourceVersions are the minimum supported store resource versions for this scope,
+  // computed by finding the highest resourceVersion reported from an individual server that it
+  // most recently transitioned scopes between.
+  // +optional
+  // +listType=map
+  // +listMapKey=storeID
+  repeated MinimumResourceVersion minimumResourceVersions = 3;
+
+  // ServerScopeVersions contains an entry for each (apiServer, store) pair detailing the progress
+  // in the store when the last scope ID was applied.
+  // +optional
+  // +listType=map
+  // +listMapKey=apiServerID,storeID
+  repeated ServerScopeVersion serverScopeVersions = 4;
+}
+
+// ServerScopeVersion contains information on when a particular apiserver first began serving
+// requests using a new mapping ID.
+// This may not be the FIRST resourceVersion served using this mapping, however it's guaranteed to always
+// be AFTER the mapping began to be served.
+message ServerScopeVersion {
+  // The ID of the reporting API server.
+  optional string apiServerID = 1;
+
+  // The ID of the storage backend in the API server.
+  // This should be consistent between different servers.
+  optional string storeID = 2;
+
+  // ScopeID is the generation of scope that this apiserver and store is recording progress for.
+  optional string scopeID = 3;
+
+  // ResourceVersion is the current resourceVersion of the store at a point at or after this generation
+  // of scope began to be used by this server.
+  optional string resourceVersion = 4;
 }
 

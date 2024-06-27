@@ -933,9 +933,12 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/scheduling/v1alpha1.PriorityClassList":                                                      schema_k8sio_api_scheduling_v1alpha1_PriorityClassList(ref),
 		"k8s.io/api/scheduling/v1beta1.PriorityClass":                                                           schema_k8sio_api_scheduling_v1beta1_PriorityClass(ref),
 		"k8s.io/api/scheduling/v1beta1.PriorityClassList":                                                       schema_k8sio_api_scheduling_v1beta1_PriorityClassList(ref),
+		"k8s.io/api/scopes/v1alpha1.MinimumResourceVersion":                                                     schema_k8sio_api_scopes_v1alpha1_MinimumResourceVersion(ref),
 		"k8s.io/api/scopes/v1alpha1.ScopeDefinition":                                                            schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref),
 		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionList":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref),
 		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus":                                                      schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionStatus(ref),
+		"k8s.io/api/scopes/v1alpha1.ServerScopeVersion":                                                         schema_k8sio_api_scopes_v1alpha1_ServerScopeVersion(ref),
 		"k8s.io/api/storage/v1.CSIDriver":                                                                       schema_k8sio_api_storage_v1_CSIDriver(ref),
 		"k8s.io/api/storage/v1.CSIDriverList":                                                                   schema_k8sio_api_storage_v1_CSIDriverList(ref),
 		"k8s.io/api/storage/v1.CSIDriverSpec":                                                                   schema_k8sio_api_storage_v1_CSIDriverSpec(ref),
@@ -47768,11 +47771,41 @@ func schema_k8sio_api_scheduling_v1beta1_PriorityClassList(ref common.ReferenceC
 	}
 }
 
+func schema_k8sio_api_scopes_v1alpha1_MinimumResourceVersion(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MinimumResourceVersion contains information about a scopes validity within a particular store.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"storeID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The ID of the storage backend in the API server.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResourceVersion is the minimum supported resource version for this scope in the store.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"storeID", "resourceVersion"},
+			},
+		},
+	}
+}
+
 func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ScopeDefinition is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `scope.k8s.io/workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
+				Description: "ScopeDefinition is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -47791,23 +47824,31 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallba
 					},
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Standard object's metadata.",
+							Description: "Standard object's metadata. The name must be of the form `<scope-name>:<scope-value>`, for example: `workspaces:my-workspace`.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec"),
+							Description: "Specification of the ScopeDefinition.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status of the ScopeDefinition.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus"),
 						},
 					},
 				},
-				Required: []string{"spec"},
+				Required: []string{"spec", "status"},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec", "k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -47867,8 +47908,13 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref common.ReferenceCa
 				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"namespaces": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Namespaces is the list of namespaces currently contained within this scope.",
+							Description: "Namespaces is a list of static & explicit namespace names to be included in the scope.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -47882,6 +47928,137 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref common.ReferenceCa
 						},
 					},
 				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"scopeID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ScopeID is a unique identifier for this generation/epoch of mapping.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespaces": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespaces is the final set of namespaces that are included within this scope.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"minimumResourceVersions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"storeID",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "MinimumResourceVersions are the minimum supported store resource versions for this scope, computed by finding the highest resourceVersion reported from an individual server that it most recently transitioned scopes between.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/scopes/v1alpha1.MinimumResourceVersion"),
+									},
+								},
+							},
+						},
+					},
+					"serverScopeVersions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"apiServerID,storeID",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "ServerScopeVersions contains an entry for each (apiServer, store) pair detailing the progress in the store when the last scope ID was applied.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/scopes/v1alpha1.ServerScopeVersion"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/scopes/v1alpha1.MinimumResourceVersion", "k8s.io/api/scopes/v1alpha1.ServerScopeVersion"},
+	}
+}
+
+func schema_k8sio_api_scopes_v1alpha1_ServerScopeVersion(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ServerScopeVersion contains information on when a particular apiserver first began serving requests using a new mapping ID. This may not be the FIRST resourceVersion served using this mapping, however it's guaranteed to always be AFTER the mapping began to be served.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"apiServerID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The ID of the reporting API server.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"storeID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The ID of the storage backend in the API server. This should be consistent between different servers.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"scopeID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ScopeID is the generation of scope that this apiserver and store is recording progress for.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"resourceVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResourceVersion is the current resourceVersion of the store at a point at or after this generation of scope began to be used by this server.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"apiServerID", "storeID", "scopeID", "resourceVersion"},
 			},
 		},
 	}

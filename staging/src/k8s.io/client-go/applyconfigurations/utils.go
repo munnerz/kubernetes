@@ -1644,10 +1644,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsschedulingv1beta1.PriorityClassApplyConfiguration{}
 
 		// Group=scopes.k8s.io, Version=v1alpha1
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("MinimumResourceVersion"):
+		return &applyconfigurationsscopesv1alpha1.MinimumResourceVersionApplyConfiguration{}
 	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinition"):
 		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionApplyConfiguration{}
 	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinitionSpec"):
 		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionSpecApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinitionStatus"):
+		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionStatusApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ServerScopeVersion"):
+		return &applyconfigurationsscopesv1alpha1.ServerScopeVersionApplyConfiguration{}
 
 		// Group=storage.k8s.io, Version=v1
 	case storagev1.SchemeGroupVersion.WithKind("CSIDriver"):

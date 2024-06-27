@@ -12768,6 +12768,17 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: numeric
       default: 0
+- name: io.k8s.api.scopes.v1alpha1.MinimumResourceVersion
+  map:
+    fields:
+    - name: resourceVersion
+      type:
+        scalar: string
+      default: ""
+    - name: storeID
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.api.scopes.v1alpha1.ScopeDefinition
   map:
     fields:
@@ -12785,6 +12796,10 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
       default: {}
+    - name: status
+      type:
+        namedType: io.k8s.api.scopes.v1alpha1.ScopeDefinitionStatus
+      default: {}
 - name: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
   map:
     fields:
@@ -12793,7 +12808,54 @@ var schemaYAML = typed.YAMLObject(`types:
         list:
           elementType:
             scalar: string
-          elementRelationship: atomic
+          elementRelationship: associative
+- name: io.k8s.api.scopes.v1alpha1.ScopeDefinitionStatus
+  map:
+    fields:
+    - name: minimumResourceVersions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.scopes.v1alpha1.MinimumResourceVersion
+          elementRelationship: associative
+          keys:
+          - storeID
+    - name: namespaces
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: scopeID
+      type:
+        scalar: string
+    - name: serverScopeVersions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.scopes.v1alpha1.ServerScopeVersion
+          elementRelationship: associative
+          keys:
+          - apiServerID,storeID
+- name: io.k8s.api.scopes.v1alpha1.ServerScopeVersion
+  map:
+    fields:
+    - name: apiServerID
+      type:
+        scalar: string
+      default: ""
+    - name: resourceVersion
+      type:
+        scalar: string
+      default: ""
+    - name: scopeID
+      type:
+        scalar: string
+      default: ""
+    - name: storeID
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.api.storage.v1.CSIDriver
   map:
     fields:
