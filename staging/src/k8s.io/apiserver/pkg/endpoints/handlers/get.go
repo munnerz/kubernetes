@@ -264,7 +264,7 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 					return
 				}
 
-				opts.LabelSelector, err = scopingLabelSelector(s, opts.LabelSelector)
+				opts.LabelSelector, err = scopingLabelSelector(s, scope.Resource.GroupResource(), opts.LabelSelector)
 				if err != nil {
 					scope.err(errors.NewInternalError(err), w, req)
 					return
