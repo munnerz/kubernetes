@@ -17,16 +17,15 @@ limitations under the License.
 package filters
 
 import (
-	"errors"
 	"fmt"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
-	genericrequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/scopes"
 	"k8s.io/klog/v2"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -50,19 +49,13 @@ func WithScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http
 func withScope(handler http.Handler, negotiatedSerializer runtime.NegotiatedSerializer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		info, ok := genericrequest.RequestInfoFrom(ctx)
-		if !ok {
-			responsewriters.InternalError(w, req, errors.New("no RequestInfo found in the context"))
-			return
-		}
-
+		var ok bool
 		var err error
-		scope := &scopes.Scope{}
 		// extract the user specified scope values
-		scope.Name, scope.Value, ok, err = parseScope(req)
+		scope := &scopes.Scope{}
+		scope.Name, scope.Value, req.URL.Path, ok, err = parseScope(req)
 		if err != nil {
-			gv := schema.GroupVersion{Group: info.APIGroup, Version: info.APIVersion}
-			responsewriters.ErrorNegotiated(apierrors.NewBadRequest(err.Error()), negotiatedSerializer, gv, w, req)
+			responsewriters.ErrorNegotiated(apierrors.NewBadRequest(err.Error()), negotiatedSerializer, meta.SchemeGroupVersion, w, req)
 			klog.Errorf("Error - %s: %#v", err.Error(), req.RequestURI)
 			return
 		}
@@ -104,15 +97,25 @@ func withScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http
 
 // parseScope parses the given HTTP request URL and extracts the scope query parameter
 // value if specified by the user.
-// If a scope is not specified the function returns false
+// If this request is not for the /scope/ path it returns false.
+// Returns a new value for the request path.
 // If the value specified is malformed then the function returns false and err is set
-func parseScope(req *http.Request) (string, string, bool, error) {
-	value := req.URL.Query().Get("scope")
-	if value == "" {
-		return "", "", false, nil
+func parseScope(req *http.Request) (string, string, string, bool, error) {
+	// todo: make this more robust
+	if !strings.HasPrefix(req.URL.Path, "/scopes/") {
+		return "", "", req.URL.Path, false, nil
+	}
+	urlPath := strings.SplitN(req.URL.Path, "/", 5)
+	if len(urlPath) != 5 {
+		return "", "", "", true, fmt.Errorf("invalid scoped request path: %v", req.URL.Path)
+	}
+	scopeName, scopeValue := urlPath[2], urlPath[3]
+	if scopeName == "" {
+		return "", "", "", true, fmt.Errorf("no scope name specified")
+	}
+	if scopeValue == "" {
+		return "", "", "", true, fmt.Errorf("no scope value specified")
 	}
 	// todo: validate the value is a valid ScopeDefinition name (dns label?)
-	// todo: support arbitrary scopeNames?
-	scopeName := "internal.apiserver.k8s.io"
-	return scopeName, value, true, nil
+	return scopeName, scopeValue, "/" + urlPath[4], true, nil
 }

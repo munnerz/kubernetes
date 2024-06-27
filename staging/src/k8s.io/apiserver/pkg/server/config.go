@@ -1071,11 +1071,13 @@ func DefaultBuildHandlerChain(apiHandler http.Handler, c *Config) http.Handler {
 	}
 	if c.FeatureGate.Enabled(genericfeatures.RequestScoping) {
 		handler = genericapifilters.WithScopeResolver(handler, c.ScopeResolver)
-		handler = genericapifilters.WithScope(handler, c.Serializer)
 	}
 	handler = genericapifilters.WithRequestInfo(handler, c.RequestInfoResolver)
 	handler = genericapifilters.WithRequestReceivedTimestamp(handler)
 	handler = genericapifilters.WithMuxAndDiscoveryComplete(handler, c.lifecycleSignals.MuxAndDiscoveryComplete.Signaled())
+	if c.FeatureGate.Enabled(genericfeatures.RequestScoping) {
+		handler = genericapifilters.WithScope(handler, c.Serializer)
+	}
 	handler = genericfilters.WithPanicRecovery(handler, c.RequestInfoResolver)
 	handler = genericapifilters.WithAuditInit(handler)
 	return handler
