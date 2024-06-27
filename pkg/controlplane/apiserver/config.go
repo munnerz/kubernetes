@@ -36,7 +36,6 @@ import (
 	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	peerreconcilers "k8s.io/apiserver/pkg/reconcilers"
-	"k8s.io/apiserver/pkg/scopes"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	"k8s.io/apiserver/pkg/server/filters"
@@ -236,7 +235,9 @@ func BuildGenericConfig(
 	}
 
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.RequestScoping) {
-		genericConfig.ScopeResolver = scopes.NewScopeDefinitionResolver(versionedInformers)
+		if lastErr = s.RequestScoping.ApplyTo(genericConfig, genericConfig.LoopbackClientConfig, storageFactory); err != nil {
+			return
+		}
 	}
 
 	return

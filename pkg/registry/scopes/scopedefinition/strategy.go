@@ -46,16 +46,27 @@ func (scopeDefinitionStrategy) NamespaceScoped() bool {
 // GetResetFields returns the set of fields that get reset by the strategy
 // and should not be modified by the user.
 func (scopeDefinitionStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
-	fields := map[fieldpath.APIVersion]*fieldpath.Set{}
-
-	return fields
+	return map[fieldpath.APIVersion]*fieldpath.Set{
+		"scopes.k8s.io/v1alpha1": fieldpath.NewSet(
+			fieldpath.MakePathOrDie("status"),
+		),
+	}
 }
 
-// PrepareForCreate does not do anything.
-func (scopeDefinitionStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {}
+// PrepareForCreate ensures status is not set.
+func (scopeDefinitionStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+	scopeDefinition := obj.(*scopes.ScopeDefinition)
+	scopeDefinition.Status = scopes.ScopeDefinitionStatus{}
+}
 
-// PrepareForUpdate clears fields that are not allowed to be set by end users on update (currently none)
-func (scopeDefinitionStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {}
+// PrepareForUpdate clears fields that are not allowed to be set by end users on update.
+func (scopeDefinitionStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+	newScopeDefinition := obj.(*scopes.ScopeDefinition)
+	oldScopeDefinition := old.(*scopes.ScopeDefinition)
+
+	// update is not allowed to set status
+	newScopeDefinition.Status = oldScopeDefinition.Status
+}
 
 // Validate validates a new daemon set.
 func (scopeDefinitionStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
@@ -99,4 +110,36 @@ func (scopeDefinitionStrategy) WarningsOnUpdate(ctx context.Context, obj, old ru
 // todo: work out if this is correct
 func (scopeDefinitionStrategy) AllowUnconditionalUpdate() bool {
 	return true
+}
+
+type scopeDefinitionStatusStrategy struct {
+	scopeDefinitionStrategy
+}
+
+// StatusStrategy is the default logic invoked when updating object status.
+var StatusStrategy = scopeDefinitionStatusStrategy{Strategy}
+
+// GetResetFields returns the set of fields that get reset by the strategy
+// and should not be modified by the user.
+func (scopeDefinitionStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
+	return map[fieldpath.APIVersion]*fieldpath.Set{
+		"scopes.k8s.io/v1alpha1": fieldpath.NewSet(
+			fieldpath.MakePathOrDie("spec"),
+		),
+	}
+}
+
+func (scopeDefinitionStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+	newScopeDefinition := obj.(*scopes.ScopeDefinition)
+	oldScopeDefinition := old.(*scopes.ScopeDefinition)
+	newScopeDefinition.Spec = oldScopeDefinition.Spec
+}
+
+func (scopeDefinitionStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
+	return validation.ValidateScopeDefinitionStatusUpdate(obj.(*scopes.ScopeDefinition), old.(*scopes.ScopeDefinition))
+}
+
+// WarningsOnUpdate returns warnings for the given update.
+func (scopeDefinitionStatusStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+	return nil
 }

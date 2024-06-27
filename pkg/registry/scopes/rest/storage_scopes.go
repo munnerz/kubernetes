@@ -46,10 +46,11 @@ func (p RESTStorageProvider) v1alpha1Storage(apiResourceConfigSource serverstora
 
 	// scopedefinitions
 	if resource := "scopedefinitions"; apiResourceConfigSource.ResourceEnabled(scopesv1alpha1.SchemeGroupVersion.WithResource(resource)) {
-		if scopeDefinitionStorage, err := scopedefinitionstore.NewREST(restOptionsGetter); err != nil {
+		if scopeDefinitionStorage, scopeDefinitionStatusStorage, err := scopedefinitionstore.NewREST(restOptionsGetter); err != nil {
 			return nil, err
 		} else {
 			storage[resource] = scopeDefinitionStorage
+			storage[resource+"/status"] = scopeDefinitionStatusStorage
 		}
 	}
 

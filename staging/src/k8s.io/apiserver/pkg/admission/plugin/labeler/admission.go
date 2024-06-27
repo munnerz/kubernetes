@@ -23,6 +23,9 @@ import (
 	"io"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apiserver/pkg/admission"
+	genericfeatures "k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+
 	// install the clientgo image policy API for use with api registry
 	_ "k8s.io/kubernetes/pkg/apis/imagepolicy/install"
 )
@@ -52,6 +55,10 @@ type Plugin struct {
 var _ admission.MutationInterface = &Plugin{}
 
 func (p *Plugin) Admit(ctx context.Context, attributes admission.Attributes, o admission.ObjectInterfaces) (err error) {
+	if !utilfeature.DefaultFeatureGate.Enabled(genericfeatures.RequestScoping) {
+		return nil
+	}
+
 	obj, err := meta.Accessor(attributes.GetObject())
 	if err != nil {
 		return fmt.Errorf("object does not implement meta accessor: %w", err)

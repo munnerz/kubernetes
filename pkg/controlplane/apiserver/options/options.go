@@ -54,6 +54,7 @@ type Options struct {
 	Authorization           *kubeoptions.BuiltInAuthorizationOptions
 	APIEnablement           *genericoptions.APIEnablementOptions
 	EgressSelector          *genericoptions.EgressSelectorOptions
+	RequestScoping          *genericoptions.RequestScopingOptions
 	Metrics                 *metrics.Options
 	Logs                    *logs.Options
 	Traces                  *genericoptions.TracingOptions
@@ -113,6 +114,7 @@ func NewOptions() *Options {
 		Metrics:                 metrics.NewOptions(),
 		Logs:                    logs.NewOptions(),
 		Traces:                  genericoptions.NewTracingOptions(),
+		RequestScoping:          genericoptions.NewRequestScopingOptions(),
 
 		EnableLogsHandler:                   false,
 		EventTTL:                            1 * time.Hour,
@@ -141,6 +143,7 @@ func (s *Options) AddFlags(fss *cliflag.NamedFlagSets) {
 	s.Metrics.AddFlags(fss.FlagSet("metrics"))
 	logsapi.AddFlags(s.Logs, fss.FlagSet("logs"))
 	s.Traces.AddFlags(fss.FlagSet("traces"))
+	s.RequestScoping.AddFlags(fss.FlagSet("request scoping"))
 
 	// Note: the weird ""+ in below lines seems to be the only way to get gofmt to
 	// arrange these text blocks sensibly. Grrr.

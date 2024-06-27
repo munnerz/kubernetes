@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	apivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/apis/scopes"
@@ -53,5 +54,18 @@ func ValidateScopeDefinitionSpecUpdate(sv, oldSV *scopes.ScopeDefinition) field.
 func validateScopeDefinitionSpec(ss scopes.ScopeDefinitionSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	// todo: verify namespace names in the list
+	return allErrs
+}
+
+// ValidateScopeDefinitionStatusUpdate tests if an update to a ScopeDefinitionStatus is valid.
+func ValidateScopeDefinitionStatusUpdate(sv, oldSV *scopes.ScopeDefinition) field.ErrorList {
+	var allErrs field.ErrorList
+	fldPath := field.NewPath("status")
+	if !apiequality.Semantic.DeepEqual(sv.Status.Namespaces, oldSV.Status.Namespaces) {
+		if sv.Status.ScopeID == oldSV.Status.ScopeID {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("scopeID"), "status.scopeID must be updated when status.namespaces is changed"))
+		}
+	}
+	// todo: verify all modified conditions are setting the scopeID to status.scopeID.
 	return allErrs
 }

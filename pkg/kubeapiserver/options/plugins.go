@@ -22,6 +22,8 @@ package options
 import (
 	"k8s.io/apiserver/pkg/admission/plugin/labeler"
 	validatingadmissionpolicy "k8s.io/apiserver/pkg/admission/plugin/policy/validating"
+	"k8s.io/kubernetes/plugin/pkg/admission/scopes"
+
 	// Admission policies
 	"k8s.io/kubernetes/plugin/pkg/admission/admit"
 	"k8s.io/kubernetes/plugin/pkg/admission/alwayspullimages"
@@ -93,6 +95,7 @@ var AllOrderedPlugins = []string{
 	defaultingressclass.PluginName,          // DefaultIngressClass
 	denyserviceexternalips.PluginName,       // DenyServiceExternalIPs
 	labeler.PluginName,                      // NamespaceLabeler
+	scopes.PluginName,                       // ScopeDefinition
 
 	// new admission plugins should generally be inserted above here
 	// webhook, resourcequota, and deny plugins must go at the end
@@ -137,6 +140,7 @@ func RegisterAllAdmissionPlugins(plugins *admission.Plugins) {
 	certsigning.Register(plugins)
 	ctbattest.Register(plugins)
 	certsubjectrestriction.Register(plugins)
+	scopes.Register(plugins)
 }
 
 // DefaultOffAdmissionPlugins get admission plugins off by default for kube-apiserver.

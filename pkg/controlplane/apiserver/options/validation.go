@@ -125,6 +125,7 @@ func (s *Options) Validate() []error {
 	errs = append(errs, s.APIEnablement.Validate(legacyscheme.Scheme, apiextensionsapiserver.Scheme, aggregatorscheme.Scheme)...)
 	errs = append(errs, validateTokenRequest(s)...)
 	errs = append(errs, s.Metrics.Validate()...)
+	errs = append(errs, s.RequestScoping.Validate()...)
 	errs = append(errs, validateUnknownVersionInteroperabilityProxyFeature()...)
 	errs = append(errs, validateUnknownVersionInteroperabilityProxyFlags(s)...)
 	errs = append(errs, validateNodeSelectorAuthorizationFeature()...)
