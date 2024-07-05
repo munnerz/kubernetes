@@ -28,8 +28,8 @@ type FakeScopesV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeScopesV1alpha1) ScopeDefinitions() v1alpha1.ScopeDefinitionInterface {
-	return &FakeScopeDefinitions{c}
+func (c *FakeScopesV1alpha1) Scopes() v1alpha1.ScopeInterface {
+	return &FakeScopes{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

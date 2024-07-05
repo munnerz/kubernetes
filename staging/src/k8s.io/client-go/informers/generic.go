@@ -397,8 +397,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Scheduling().V1beta1().PriorityClasses().Informer()}, nil
 
 		// Group=scopes.k8s.io, Version=v1alpha1
-	case scopesv1alpha1.SchemeGroupVersion.WithResource("scopedefinitions"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Scopes().V1alpha1().ScopeDefinitions().Informer()}, nil
+	case scopesv1alpha1.SchemeGroupVersion.WithResource("scopes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Scopes().V1alpha1().Scopes().Informer()}, nil
 
 		// Group=storage.k8s.io, Version=v1
 	case storagev1.SchemeGroupVersion.WithResource("csidrivers"):

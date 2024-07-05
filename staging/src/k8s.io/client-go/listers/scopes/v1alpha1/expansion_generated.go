@@ -18,6 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-// ScopeDefinitionListerExpansion allows custom methods to be added to
-// ScopeDefinitionLister.
-type ScopeDefinitionListerExpansion interface{}
+// ScopeListerExpansion allows custom methods to be added to
+// ScopeLister.
+type ScopeListerExpansion interface{}

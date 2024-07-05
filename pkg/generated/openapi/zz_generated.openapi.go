@@ -934,10 +934,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/scheduling/v1beta1.PriorityClass":                                                           schema_k8sio_api_scheduling_v1beta1_PriorityClass(ref),
 		"k8s.io/api/scheduling/v1beta1.PriorityClassList":                                                       schema_k8sio_api_scheduling_v1beta1_PriorityClassList(ref),
 		"k8s.io/api/scopes/v1alpha1.MinimumResourceVersion":                                                     schema_k8sio_api_scopes_v1alpha1_MinimumResourceVersion(ref),
-		"k8s.io/api/scopes/v1alpha1.ScopeDefinition":                                                            schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref),
-		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionList":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref),
-		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec":                                                        schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref),
-		"k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus":                                                      schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionStatus(ref),
+		"k8s.io/api/scopes/v1alpha1.Scope":                                                                      schema_k8sio_api_scopes_v1alpha1_Scope(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeList":                                                                  schema_k8sio_api_scopes_v1alpha1_ScopeList(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeSpec":                                                                  schema_k8sio_api_scopes_v1alpha1_ScopeSpec(ref),
+		"k8s.io/api/scopes/v1alpha1.ScopeStatus":                                                                schema_k8sio_api_scopes_v1alpha1_ScopeStatus(ref),
 		"k8s.io/api/scopes/v1alpha1.ServerScopeVersion":                                                         schema_k8sio_api_scopes_v1alpha1_ServerScopeVersion(ref),
 		"k8s.io/api/storage/v1.CSIDriver":                                                                       schema_k8sio_api_storage_v1_CSIDriver(ref),
 		"k8s.io/api/storage/v1.CSIDriverList":                                                                   schema_k8sio_api_storage_v1_CSIDriverList(ref),
@@ -47801,11 +47801,11 @@ func schema_k8sio_api_scopes_v1alpha1_MinimumResourceVersion(ref common.Referenc
 	}
 }
 
-func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_k8sio_api_scopes_v1alpha1_Scope(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ScopeDefinition is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
+				Description: "Scope is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a Scope in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -47831,16 +47831,16 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallba
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Specification of the ScopeDefinition.",
+							Description: "Specification of the Scope.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec"),
+							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Status of the ScopeDefinition.",
+							Description: "Status of the Scope.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus"),
+							Ref:         ref("k8s.io/api/scopes/v1alpha1.ScopeStatus"),
 						},
 					},
 				},
@@ -47848,15 +47848,15 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinition(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/scopes/v1alpha1.ScopeDefinitionSpec", "k8s.io/api/scopes/v1alpha1.ScopeDefinitionStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"k8s.io/api/scopes/v1alpha1.ScopeSpec", "k8s.io/api/scopes/v1alpha1.ScopeStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_k8sio_api_scopes_v1alpha1_ScopeList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ScopeDefinitionList is a collection of ScopeDefinition objects.",
+				Description: "ScopeList is a collection of Scope objects.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -47887,7 +47887,7 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("k8s.io/api/scopes/v1alpha1.ScopeDefinition"),
+										Ref:     ref("k8s.io/api/scopes/v1alpha1.Scope"),
 									},
 								},
 							},
@@ -47897,11 +47897,11 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/scopes/v1alpha1.ScopeDefinition", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			"k8s.io/api/scopes/v1alpha1.Scope", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 	}
 }
 
-func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_k8sio_api_scopes_v1alpha1_ScopeSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -47933,7 +47933,7 @@ func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionSpec(ref common.ReferenceCa
 	}
 }
 
-func schema_k8sio_api_scopes_v1alpha1_ScopeDefinitionStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_k8sio_api_scopes_v1alpha1_ScopeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{

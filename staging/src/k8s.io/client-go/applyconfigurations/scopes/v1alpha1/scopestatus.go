@@ -18,25 +18,25 @@ limitations under the License.
 
 package v1alpha1
 
-// ScopeDefinitionStatusApplyConfiguration represents a declarative configuration of the ScopeDefinitionStatus type for use
+// ScopeStatusApplyConfiguration represents a declarative configuration of the ScopeStatus type for use
 // with apply.
-type ScopeDefinitionStatusApplyConfiguration struct {
+type ScopeStatusApplyConfiguration struct {
 	ScopeID                 *string                                    `json:"scopeID,omitempty"`
 	Namespaces              []string                                   `json:"namespaces,omitempty"`
 	MinimumResourceVersions []MinimumResourceVersionApplyConfiguration `json:"minimumResourceVersions,omitempty"`
 	ServerScopeVersions     []ServerScopeVersionApplyConfiguration     `json:"serverScopeVersions,omitempty"`
 }
 
-// ScopeDefinitionStatusApplyConfiguration constructs a declarative configuration of the ScopeDefinitionStatus type for use with
+// ScopeStatusApplyConfiguration constructs a declarative configuration of the ScopeStatus type for use with
 // apply.
-func ScopeDefinitionStatus() *ScopeDefinitionStatusApplyConfiguration {
-	return &ScopeDefinitionStatusApplyConfiguration{}
+func ScopeStatus() *ScopeStatusApplyConfiguration {
+	return &ScopeStatusApplyConfiguration{}
 }
 
 // WithScopeID sets the ScopeID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ScopeID field is set to the value of the last call.
-func (b *ScopeDefinitionStatusApplyConfiguration) WithScopeID(value string) *ScopeDefinitionStatusApplyConfiguration {
+func (b *ScopeStatusApplyConfiguration) WithScopeID(value string) *ScopeStatusApplyConfiguration {
 	b.ScopeID = &value
 	return b
 }
@@ -44,7 +44,7 @@ func (b *ScopeDefinitionStatusApplyConfiguration) WithScopeID(value string) *Sco
 // WithNamespaces adds the given value to the Namespaces field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Namespaces field.
-func (b *ScopeDefinitionStatusApplyConfiguration) WithNamespaces(values ...string) *ScopeDefinitionStatusApplyConfiguration {
+func (b *ScopeStatusApplyConfiguration) WithNamespaces(values ...string) *ScopeStatusApplyConfiguration {
 	for i := range values {
 		b.Namespaces = append(b.Namespaces, values[i])
 	}
@@ -54,7 +54,7 @@ func (b *ScopeDefinitionStatusApplyConfiguration) WithNamespaces(values ...strin
 // WithMinimumResourceVersions adds the given value to the MinimumResourceVersions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the MinimumResourceVersions field.
-func (b *ScopeDefinitionStatusApplyConfiguration) WithMinimumResourceVersions(values ...*MinimumResourceVersionApplyConfiguration) *ScopeDefinitionStatusApplyConfiguration {
+func (b *ScopeStatusApplyConfiguration) WithMinimumResourceVersions(values ...*MinimumResourceVersionApplyConfiguration) *ScopeStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithMinimumResourceVersions")
@@ -67,7 +67,7 @@ func (b *ScopeDefinitionStatusApplyConfiguration) WithMinimumResourceVersions(va
 // WithServerScopeVersions adds the given value to the ServerScopeVersions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the ServerScopeVersions field.
-func (b *ScopeDefinitionStatusApplyConfiguration) WithServerScopeVersions(values ...*ServerScopeVersionApplyConfiguration) *ScopeDefinitionStatusApplyConfiguration {
+func (b *ScopeStatusApplyConfiguration) WithServerScopeVersions(values ...*ServerScopeVersionApplyConfiguration) *ScopeStatusApplyConfiguration {
 	for i := range values {
 		if values[i] == nil {
 			panic("nil value passed to WithServerScopeVersions")

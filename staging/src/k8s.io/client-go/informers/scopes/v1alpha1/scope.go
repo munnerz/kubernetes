@@ -32,58 +32,58 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// ScopeDefinitionInformer provides access to a shared informer and lister for
-// ScopeDefinitions.
-type ScopeDefinitionInformer interface {
+// ScopeInformer provides access to a shared informer and lister for
+// Scopes.
+type ScopeInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ScopeDefinitionLister
+	Lister() v1alpha1.ScopeLister
 }
 
-type scopeDefinitionInformer struct {
+type scopeInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
-// NewScopeDefinitionInformer constructs a new informer for ScopeDefinition type.
+// NewScopeInformer constructs a new informer for Scope type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewScopeDefinitionInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredScopeDefinitionInformer(client, resyncPeriod, indexers, nil)
+func NewScopeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredScopeInformer(client, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredScopeDefinitionInformer constructs a new informer for ScopeDefinition type.
+// NewFilteredScopeInformer constructs a new informer for Scope type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredScopeDefinitionInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredScopeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ScopesV1alpha1().ScopeDefinitions().List(context.TODO(), options)
+				return client.ScopesV1alpha1().Scopes().List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ScopesV1alpha1().ScopeDefinitions().Watch(context.TODO(), options)
+				return client.ScopesV1alpha1().Scopes().Watch(context.TODO(), options)
 			},
 		},
-		&scopesv1alpha1.ScopeDefinition{},
+		&scopesv1alpha1.Scope{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *scopeDefinitionInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredScopeDefinitionInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *scopeInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredScopeInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *scopeDefinitionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&scopesv1alpha1.ScopeDefinition{}, f.defaultInformer)
+func (f *scopeInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&scopesv1alpha1.Scope{}, f.defaultInformer)
 }
 
-func (f *scopeDefinitionInformer) Lister() v1alpha1.ScopeDefinitionLister {
-	return v1alpha1.NewScopeDefinitionLister(f.Informer().GetIndexer())
+func (f *scopeInformer) Lister() v1alpha1.ScopeLister {
+	return v1alpha1.NewScopeLister(f.Informer().GetIndexer())
 }

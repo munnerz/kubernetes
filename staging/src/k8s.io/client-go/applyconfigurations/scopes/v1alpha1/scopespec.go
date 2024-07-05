@@ -18,22 +18,22 @@ limitations under the License.
 
 package v1alpha1
 
-// ScopeDefinitionSpecApplyConfiguration represents a declarative configuration of the ScopeDefinitionSpec type for use
+// ScopeSpecApplyConfiguration represents a declarative configuration of the ScopeSpec type for use
 // with apply.
-type ScopeDefinitionSpecApplyConfiguration struct {
+type ScopeSpecApplyConfiguration struct {
 	Namespaces []string `json:"namespaces,omitempty"`
 }
 
-// ScopeDefinitionSpecApplyConfiguration constructs a declarative configuration of the ScopeDefinitionSpec type for use with
+// ScopeSpecApplyConfiguration constructs a declarative configuration of the ScopeSpec type for use with
 // apply.
-func ScopeDefinitionSpec() *ScopeDefinitionSpecApplyConfiguration {
-	return &ScopeDefinitionSpecApplyConfiguration{}
+func ScopeSpec() *ScopeSpecApplyConfiguration {
+	return &ScopeSpecApplyConfiguration{}
 }
 
 // WithNamespaces adds the given value to the Namespaces field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Namespaces field.
-func (b *ScopeDefinitionSpecApplyConfiguration) WithNamespaces(values ...string) *ScopeDefinitionSpecApplyConfiguration {
+func (b *ScopeSpecApplyConfiguration) WithNamespaces(values ...string) *ScopeSpecApplyConfiguration {
 	for i := range values {
 		b.Namespaces = append(b.Namespaces, values[i])
 	}

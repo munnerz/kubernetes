@@ -1646,12 +1646,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		// Group=scopes.k8s.io, Version=v1alpha1
 	case scopesv1alpha1.SchemeGroupVersion.WithKind("MinimumResourceVersion"):
 		return &applyconfigurationsscopesv1alpha1.MinimumResourceVersionApplyConfiguration{}
-	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinition"):
-		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionApplyConfiguration{}
-	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinitionSpec"):
-		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionSpecApplyConfiguration{}
-	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeDefinitionStatus"):
-		return &applyconfigurationsscopesv1alpha1.ScopeDefinitionStatusApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("Scope"):
+		return &applyconfigurationsscopesv1alpha1.ScopeApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeSpec"):
+		return &applyconfigurationsscopesv1alpha1.ScopeSpecApplyConfiguration{}
+	case scopesv1alpha1.SchemeGroupVersion.WithKind("ScopeStatus"):
+		return &applyconfigurationsscopesv1alpha1.ScopeStatusApplyConfiguration{}
 	case scopesv1alpha1.SchemeGroupVersion.WithKind("ServerScopeVersion"):
 		return &applyconfigurationsscopesv1alpha1.ServerScopeVersionApplyConfiguration{}
 

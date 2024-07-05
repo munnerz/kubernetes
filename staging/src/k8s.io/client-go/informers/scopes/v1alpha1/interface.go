@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// ScopeDefinitions returns a ScopeDefinitionInformer.
-	ScopeDefinitions() ScopeDefinitionInformer
+	// Scopes returns a ScopeInformer.
+	Scopes() ScopeInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ScopeDefinitions returns a ScopeDefinitionInformer.
-func (v *version) ScopeDefinitions() ScopeDefinitionInformer {
-	return &scopeDefinitionInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// Scopes returns a ScopeInformer.
+func (v *version) Scopes() ScopeInformer {
+	return &scopeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

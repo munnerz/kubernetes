@@ -37,43 +37,43 @@ func (MinimumResourceVersion) SwaggerDoc() map[string]string {
 	return map_MinimumResourceVersion
 }
 
-var map_ScopeDefinition = map[string]string{
-	"":         "ScopeDefinition is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
+var map_Scope = map[string]string{
+	"":         "Scope is a definition of a mapping between a scope (name, value) tuple and a list of namespace names. The metadata.namespace field is used to represent the scope name, and the metadata.name field is used to represent the scope value. For example, a Scope in the namespace 'workspace' with name 'my-workspace' would correspond to the scope selector `workspace=my-workspace`. A scopes generation field is used to uniquely identify a revision of a scope configuration.",
 	"metadata": "Standard object's metadata. The name must be of the form `<scope-name>:<scope-value>`, for example: `workspaces:my-workspace`.",
-	"spec":     "Specification of the ScopeDefinition.",
-	"status":   "Status of the ScopeDefinition.",
+	"spec":     "Specification of the Scope.",
+	"status":   "Status of the Scope.",
 }
 
-func (ScopeDefinition) SwaggerDoc() map[string]string {
-	return map_ScopeDefinition
+func (Scope) SwaggerDoc() map[string]string {
+	return map_Scope
 }
 
-var map_ScopeDefinitionList = map[string]string{
-	"":         "ScopeDefinitionList is a collection of ScopeDefinition objects.",
+var map_ScopeList = map[string]string{
+	"":         "ScopeList is a collection of Scope objects.",
 	"metadata": "Standard object's metadata.",
 }
 
-func (ScopeDefinitionList) SwaggerDoc() map[string]string {
-	return map_ScopeDefinitionList
+func (ScopeList) SwaggerDoc() map[string]string {
+	return map_ScopeList
 }
 
-var map_ScopeDefinitionSpec = map[string]string{
+var map_ScopeSpec = map[string]string{
 	"namespaces": "Namespaces is a list of static & explicit namespace names to be included in the scope.",
 }
 
-func (ScopeDefinitionSpec) SwaggerDoc() map[string]string {
-	return map_ScopeDefinitionSpec
+func (ScopeSpec) SwaggerDoc() map[string]string {
+	return map_ScopeSpec
 }
 
-var map_ScopeDefinitionStatus = map[string]string{
+var map_ScopeStatus = map[string]string{
 	"scopeID":                 "ScopeID is a unique identifier for this generation/epoch of mapping.",
 	"namespaces":              "Namespaces is the final set of namespaces that are included within this scope.",
 	"minimumResourceVersions": "MinimumResourceVersions are the minimum supported store resource versions for this scope, computed by finding the highest resourceVersion reported from an individual server that it most recently transitioned scopes between.",
 	"serverScopeVersions":     "ServerScopeVersions contains an entry for each (apiServer, store) pair detailing the progress in the store when the last scope ID was applied.",
 }
 
-func (ScopeDefinitionStatus) SwaggerDoc() map[string]string {
-	return map_ScopeDefinitionStatus
+func (ScopeStatus) SwaggerDoc() map[string]string {
+	return map_ScopeStatus
 }
 
 var map_ServerScopeVersion = map[string]string{

@@ -25,24 +25,24 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// ScopeDefinitionLister helps list ScopeDefinitions.
+// ScopeLister helps list Scopes.
 // All objects returned here must be treated as read-only.
-type ScopeDefinitionLister interface {
-	// List lists all ScopeDefinitions in the indexer.
+type ScopeLister interface {
+	// List lists all Scopes in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ScopeDefinition, err error)
-	// Get retrieves the ScopeDefinition from the index for a given name.
+	List(selector labels.Selector) (ret []*v1alpha1.Scope, err error)
+	// Get retrieves the Scope from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ScopeDefinition, error)
-	ScopeDefinitionListerExpansion
+	Get(name string) (*v1alpha1.Scope, error)
+	ScopeListerExpansion
 }
 
-// scopeDefinitionLister implements the ScopeDefinitionLister interface.
-type scopeDefinitionLister struct {
-	listers.ResourceIndexer[*v1alpha1.ScopeDefinition]
+// scopeLister implements the ScopeLister interface.
+type scopeLister struct {
+	listers.ResourceIndexer[*v1alpha1.Scope]
 }
 
-// NewScopeDefinitionLister returns a new ScopeDefinitionLister.
-func NewScopeDefinitionLister(indexer cache.Indexer) ScopeDefinitionLister {
-	return &scopeDefinitionLister{listers.New[*v1alpha1.ScopeDefinition](indexer, v1alpha1.Resource("scopedefinition"))}
+// NewScopeLister returns a new ScopeLister.
+func NewScopeLister(indexer cache.Indexer) ScopeLister {
+	return &scopeLister{listers.New[*v1alpha1.Scope](indexer, v1alpha1.Resource("scope"))}
 }

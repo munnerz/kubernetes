@@ -71,15 +71,15 @@ func (m *MinimumResourceVersion) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MinimumResourceVersion proto.InternalMessageInfo
 
-func (m *ScopeDefinition) Reset()      { *m = ScopeDefinition{} }
-func (*ScopeDefinition) ProtoMessage() {}
-func (*ScopeDefinition) Descriptor() ([]byte, []int) {
+func (m *Scope) Reset()      { *m = Scope{} }
+func (*Scope) ProtoMessage() {}
+func (*Scope) Descriptor() ([]byte, []int) {
 	return fileDescriptor_621232a73507ce3e, []int{1}
 }
-func (m *ScopeDefinition) XXX_Unmarshal(b []byte) error {
+func (m *Scope) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ScopeDefinition) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Scope) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -87,27 +87,27 @@ func (m *ScopeDefinition) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 	}
 	return b[:n], nil
 }
-func (m *ScopeDefinition) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ScopeDefinition.Merge(m, src)
+func (m *Scope) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Scope.Merge(m, src)
 }
-func (m *ScopeDefinition) XXX_Size() int {
+func (m *Scope) XXX_Size() int {
 	return m.Size()
 }
-func (m *ScopeDefinition) XXX_DiscardUnknown() {
-	xxx_messageInfo_ScopeDefinition.DiscardUnknown(m)
+func (m *Scope) XXX_DiscardUnknown() {
+	xxx_messageInfo_Scope.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ScopeDefinition proto.InternalMessageInfo
+var xxx_messageInfo_Scope proto.InternalMessageInfo
 
-func (m *ScopeDefinitionList) Reset()      { *m = ScopeDefinitionList{} }
-func (*ScopeDefinitionList) ProtoMessage() {}
-func (*ScopeDefinitionList) Descriptor() ([]byte, []int) {
+func (m *ScopeList) Reset()      { *m = ScopeList{} }
+func (*ScopeList) ProtoMessage() {}
+func (*ScopeList) Descriptor() ([]byte, []int) {
 	return fileDescriptor_621232a73507ce3e, []int{2}
 }
-func (m *ScopeDefinitionList) XXX_Unmarshal(b []byte) error {
+func (m *ScopeList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ScopeDefinitionList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScopeList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -115,27 +115,27 @@ func (m *ScopeDefinitionList) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 	}
 	return b[:n], nil
 }
-func (m *ScopeDefinitionList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ScopeDefinitionList.Merge(m, src)
+func (m *ScopeList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScopeList.Merge(m, src)
 }
-func (m *ScopeDefinitionList) XXX_Size() int {
+func (m *ScopeList) XXX_Size() int {
 	return m.Size()
 }
-func (m *ScopeDefinitionList) XXX_DiscardUnknown() {
-	xxx_messageInfo_ScopeDefinitionList.DiscardUnknown(m)
+func (m *ScopeList) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScopeList.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ScopeDefinitionList proto.InternalMessageInfo
+var xxx_messageInfo_ScopeList proto.InternalMessageInfo
 
-func (m *ScopeDefinitionSpec) Reset()      { *m = ScopeDefinitionSpec{} }
-func (*ScopeDefinitionSpec) ProtoMessage() {}
-func (*ScopeDefinitionSpec) Descriptor() ([]byte, []int) {
+func (m *ScopeSpec) Reset()      { *m = ScopeSpec{} }
+func (*ScopeSpec) ProtoMessage() {}
+func (*ScopeSpec) Descriptor() ([]byte, []int) {
 	return fileDescriptor_621232a73507ce3e, []int{3}
 }
-func (m *ScopeDefinitionSpec) XXX_Unmarshal(b []byte) error {
+func (m *ScopeSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ScopeDefinitionSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScopeSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -143,27 +143,27 @@ func (m *ScopeDefinitionSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 	}
 	return b[:n], nil
 }
-func (m *ScopeDefinitionSpec) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ScopeDefinitionSpec.Merge(m, src)
+func (m *ScopeSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScopeSpec.Merge(m, src)
 }
-func (m *ScopeDefinitionSpec) XXX_Size() int {
+func (m *ScopeSpec) XXX_Size() int {
 	return m.Size()
 }
-func (m *ScopeDefinitionSpec) XXX_DiscardUnknown() {
-	xxx_messageInfo_ScopeDefinitionSpec.DiscardUnknown(m)
+func (m *ScopeSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScopeSpec.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ScopeDefinitionSpec proto.InternalMessageInfo
+var xxx_messageInfo_ScopeSpec proto.InternalMessageInfo
 
-func (m *ScopeDefinitionStatus) Reset()      { *m = ScopeDefinitionStatus{} }
-func (*ScopeDefinitionStatus) ProtoMessage() {}
-func (*ScopeDefinitionStatus) Descriptor() ([]byte, []int) {
+func (m *ScopeStatus) Reset()      { *m = ScopeStatus{} }
+func (*ScopeStatus) ProtoMessage() {}
+func (*ScopeStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_621232a73507ce3e, []int{4}
 }
-func (m *ScopeDefinitionStatus) XXX_Unmarshal(b []byte) error {
+func (m *ScopeStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ScopeDefinitionStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScopeStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -171,17 +171,17 @@ func (m *ScopeDefinitionStatus) XXX_Marshal(b []byte, deterministic bool) ([]byt
 	}
 	return b[:n], nil
 }
-func (m *ScopeDefinitionStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ScopeDefinitionStatus.Merge(m, src)
+func (m *ScopeStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScopeStatus.Merge(m, src)
 }
-func (m *ScopeDefinitionStatus) XXX_Size() int {
+func (m *ScopeStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *ScopeDefinitionStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_ScopeDefinitionStatus.DiscardUnknown(m)
+func (m *ScopeStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScopeStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ScopeDefinitionStatus proto.InternalMessageInfo
+var xxx_messageInfo_ScopeStatus proto.InternalMessageInfo
 
 func (m *ServerScopeVersion) Reset()      { *m = ServerScopeVersion{} }
 func (*ServerScopeVersion) ProtoMessage() {}
@@ -213,10 +213,10 @@ var xxx_messageInfo_ServerScopeVersion proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MinimumResourceVersion)(nil), "k8s.io.api.scopes.v1alpha1.MinimumResourceVersion")
-	proto.RegisterType((*ScopeDefinition)(nil), "k8s.io.api.scopes.v1alpha1.ScopeDefinition")
-	proto.RegisterType((*ScopeDefinitionList)(nil), "k8s.io.api.scopes.v1alpha1.ScopeDefinitionList")
-	proto.RegisterType((*ScopeDefinitionSpec)(nil), "k8s.io.api.scopes.v1alpha1.ScopeDefinitionSpec")
-	proto.RegisterType((*ScopeDefinitionStatus)(nil), "k8s.io.api.scopes.v1alpha1.ScopeDefinitionStatus")
+	proto.RegisterType((*Scope)(nil), "k8s.io.api.scopes.v1alpha1.Scope")
+	proto.RegisterType((*ScopeList)(nil), "k8s.io.api.scopes.v1alpha1.ScopeList")
+	proto.RegisterType((*ScopeSpec)(nil), "k8s.io.api.scopes.v1alpha1.ScopeSpec")
+	proto.RegisterType((*ScopeStatus)(nil), "k8s.io.api.scopes.v1alpha1.ScopeStatus")
 	proto.RegisterType((*ServerScopeVersion)(nil), "k8s.io.api.scopes.v1alpha1.ServerScopeVersion")
 }
 
@@ -225,47 +225,47 @@ func init() {
 }
 
 var fileDescriptor_621232a73507ce3e = []byte{
-	// 635 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0xcd, 0x24, 0xe9, 0xdf, 0xe4, 0xfb, 0x1a, 0x34, 0x11, 0x34, 0x0a, 0x92, 0x5b, 0x79, 0x55,
-	0x40, 0x8c, 0x49, 0x04, 0x88, 0x25, 0xb5, 0xca, 0xa2, 0x12, 0x85, 0x32, 0x95, 0x90, 0x40, 0x2c,
-	0x98, 0xba, 0x53, 0x67, 0x28, 0xfe, 0x91, 0x67, 0x1c, 0x89, 0x05, 0x12, 0x6c, 0xd8, 0x21, 0xf1,
-	0x0a, 0x3c, 0x0c, 0x52, 0x97, 0x5d, 0x76, 0x55, 0x11, 0xc3, 0x83, 0xa0, 0x19, 0x3b, 0x3f, 0xd8,
-	0x4e, 0x43, 0x76, 0x99, 0x7b, 0xef, 0x39, 0xf7, 0xcc, 0xb9, 0x9e, 0x1b, 0x78, 0xfb, 0xf4, 0x91,
-	0xc0, 0x3c, 0xb0, 0x68, 0xc8, 0x2d, 0xe1, 0x04, 0x21, 0x13, 0xd6, 0xa0, 0x4b, 0xdf, 0x87, 0x7d,
-	0xda, 0xb5, 0x5c, 0xe6, 0xb3, 0x88, 0x4a, 0x76, 0x8c, 0xc3, 0x28, 0x90, 0x01, 0xea, 0xa4, 0xb5,
-	0x98, 0x86, 0x1c, 0xa7, 0xb5, 0x78, 0x54, 0xdb, 0xb9, 0xeb, 0x72, 0xd9, 0x8f, 0x8f, 0xb0, 0x13,
-	0x78, 0x96, 0x1b, 0xb8, 0x81, 0xa5, 0x21, 0x47, 0xf1, 0x89, 0x3e, 0xe9, 0x83, 0xfe, 0x95, 0x52,
-	0x75, 0xee, 0x4f, 0xda, 0x7a, 0xd4, 0xe9, 0x73, 0x9f, 0x45, 0x1f, 0xac, 0xf0, 0xd4, 0x55, 0x01,
-	0x61, 0x79, 0x4c, 0x52, 0x6b, 0x50, 0x10, 0xd0, 0xb1, 0x66, 0xa1, 0xa2, 0xd8, 0x97, 0xdc, 0x63,
-	0x05, 0xc0, 0xc3, 0x79, 0x00, 0xe1, 0xf4, 0x99, 0x47, 0xf3, 0x38, 0xf3, 0x0b, 0x80, 0x37, 0xf6,
-	0xb9, 0xcf, 0xbd, 0xd8, 0x23, 0x4c, 0x04, 0x71, 0xe4, 0xb0, 0x97, 0x2c, 0x12, 0x3c, 0xf0, 0xd1,
-	0x2d, 0xb8, 0x22, 0x64, 0x10, 0xb1, 0xbd, 0xdd, 0x36, 0xd8, 0x02, 0xdb, 0x6b, 0x76, 0xf3, 0xec,
-	0x72, 0xb3, 0x92, 0x5c, 0x6e, 0xae, 0x1c, 0xa6, 0x61, 0x32, 0xca, 0xa3, 0x1d, 0xd8, 0x8c, 0xfe,
-	0x46, 0xb7, 0xab, 0x1a, 0xb2, 0x91, 0x41, 0x9a, 0x39, 0x72, 0x92, 0xaf, 0x37, 0xbf, 0x57, 0x61,
-	0xf3, 0x50, 0x59, 0xbd, 0xcb, 0x4e, 0xb8, 0xcf, 0xa5, 0x52, 0xf0, 0x16, 0xae, 0x2a, 0x83, 0x8e,
-	0xa9, 0xa4, 0x5a, 0x42, 0xa3, 0x77, 0x0f, 0x4f, 0x26, 0x33, 0xbe, 0x27, 0x0e, 0x4f, 0x5d, 0x15,
-	0x10, 0x58, 0x55, 0xe3, 0x41, 0x17, 0x3f, 0x3f, 0x7a, 0xc7, 0x1c, 0xb9, 0xcf, 0x24, 0xb5, 0x51,
-	0xa6, 0x00, 0x4e, 0x62, 0x64, 0xcc, 0x8a, 0x5e, 0xc0, 0xba, 0x08, 0x99, 0xa3, 0xd5, 0x36, 0x7a,
-	0x16, 0x9e, 0x3d, 0x77, 0x9c, 0x13, 0x77, 0x18, 0x32, 0xc7, 0xfe, 0x2f, 0x23, 0xaf, 0xab, 0x13,
-	0xd1, 0x54, 0xe8, 0x15, 0x5c, 0x16, 0x92, 0xca, 0x58, 0xb4, 0x6b, 0x9a, 0xb4, 0xbb, 0x08, 0xa9,
-	0x06, 0xda, 0xeb, 0x19, 0xed, 0x72, 0x7a, 0x26, 0x19, 0xa1, 0xf9, 0x03, 0xc0, 0x56, 0x0e, 0xf1,
-	0x94, 0x0b, 0x89, 0xde, 0x14, 0x7c, 0xc2, 0xff, 0xe6, 0x93, 0x42, 0x6b, 0x97, 0xae, 0x65, 0x1d,
-	0x57, 0x47, 0x91, 0x29, 0x8f, 0x0e, 0xe0, 0x12, 0x97, 0xcc, 0x13, 0xed, 0xea, 0x56, 0x6d, 0xbb,
-	0xd1, 0xbb, 0xb3, 0xc0, 0x7d, 0xec, 0xff, 0x33, 0xde, 0xa5, 0x3d, 0xc5, 0x40, 0x52, 0x22, 0xf3,
-	0x49, 0xe1, 0x1a, 0xca, 0x3f, 0x84, 0x21, 0xf4, 0xa9, 0xc7, 0x44, 0x48, 0x1d, 0x26, 0xda, 0x60,
-	0xab, 0xb6, 0xbd, 0x66, 0xaf, 0xab, 0xd1, 0x3d, 0x1b, 0x47, 0xc9, 0x54, 0x85, 0xf9, 0xb9, 0x06,
-	0xaf, 0x97, 0x1a, 0xa8, 0x3f, 0x5d, 0x95, 0x28, 0xf9, 0x74, 0xd3, 0x30, 0x19, 0xe5, 0x73, 0x4d,
-	0xab, 0xf3, 0x9a, 0xa2, 0xaf, 0x00, 0x6e, 0x78, 0xa5, 0x0f, 0x46, 0x0d, 0x5c, 0x19, 0xd4, 0xbb,
-	0xca, 0xa0, 0xf2, 0xb7, 0x66, 0x6f, 0x66, 0xfa, 0x36, 0xca, 0xf3, 0x82, 0xcc, 0xea, 0x89, 0x3e,
-	0xc2, 0x96, 0x60, 0xd1, 0x80, 0x45, 0xfa, 0x66, 0x63, 0x29, 0x75, 0x2d, 0x05, 0x5f, 0x39, 0xab,
-	0x02, 0xcc, 0xbe, 0x99, 0xc9, 0x68, 0x15, 0x73, 0x82, 0x94, 0xf5, 0x31, 0x7f, 0x03, 0x88, 0x8a,
-	0xc5, 0xe8, 0x01, 0x6c, 0xd0, 0x90, 0xa7, 0x89, 0xf1, 0x10, 0x5a, 0x19, 0x7b, 0x63, 0xe7, 0x60,
-	0x6f, 0x94, 0x22, 0xd3, 0x75, 0xd3, 0x2b, 0xa7, 0x3a, 0x67, 0xe5, 0x4c, 0x8d, 0xb8, 0x36, 0x67,
-	0xc4, 0x25, 0xdb, 0xa9, 0xbe, 0xd8, 0x76, 0xb2, 0x1f, 0x9f, 0x0d, 0x8d, 0xca, 0xf9, 0xd0, 0xa8,
-	0x5c, 0x0c, 0x8d, 0xca, 0xa7, 0xc4, 0x00, 0x67, 0x89, 0x01, 0xce, 0x13, 0x03, 0x5c, 0x24, 0x06,
-	0xf8, 0x99, 0x18, 0xe0, 0xdb, 0x2f, 0xa3, 0xf2, 0xba, 0x33, 0xfb, 0x2f, 0xe6, 0x4f, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0xea, 0xa1, 0x18, 0x8d, 0x7f, 0x06, 0x00, 0x00,
+	// 628 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0x4f, 0x6b, 0xd4, 0x4e,
+	0x18, 0xde, 0xc9, 0x6e, 0xff, 0x4d, 0x7e, 0xbf, 0x56, 0xa6, 0x60, 0x97, 0x15, 0xd2, 0x1a, 0x10,
+	0xab, 0xe0, 0xc4, 0x2e, 0x2a, 0x82, 0x17, 0x1b, 0x44, 0x29, 0x58, 0x2b, 0x53, 0xf0, 0x20, 0x1e,
+	0x9c, 0xa6, 0x63, 0x76, 0xac, 0xf9, 0x43, 0x66, 0xb2, 0xe0, 0x41, 0x10, 0x04, 0x6f, 0x82, 0x5f,
+	0xc5, 0x6f, 0xd1, 0x63, 0x8f, 0x3d, 0x15, 0x1b, 0xfd, 0x0e, 0x5e, 0x65, 0x26, 0xd9, 0xdd, 0xb8,
+	0xc9, 0x36, 0x7a, 0xdb, 0xf7, 0x7d, 0x9f, 0xe7, 0x79, 0xdf, 0x79, 0xde, 0xd9, 0x09, 0xbc, 0x79,
+	0x74, 0x5f, 0x60, 0x1e, 0x39, 0x34, 0xe6, 0x8e, 0xf0, 0xa2, 0x98, 0x09, 0x67, 0xb8, 0x45, 0xdf,
+	0xc5, 0x03, 0xba, 0xe5, 0xf8, 0x2c, 0x64, 0x09, 0x95, 0xec, 0x10, 0xc7, 0x49, 0x24, 0x23, 0xd4,
+	0xcb, 0xb1, 0x98, 0xc6, 0x1c, 0xe7, 0x58, 0x3c, 0xc2, 0xf6, 0x6e, 0xf9, 0x5c, 0x0e, 0xd2, 0x03,
+	0xec, 0x45, 0x81, 0xe3, 0x47, 0x7e, 0xe4, 0x68, 0xca, 0x41, 0xfa, 0x46, 0x47, 0x3a, 0xd0, 0xbf,
+	0x72, 0xa9, 0xde, 0x9d, 0x49, 0xdb, 0x80, 0x7a, 0x03, 0x1e, 0xb2, 0xe4, 0xbd, 0x13, 0x1f, 0xf9,
+	0x2a, 0x21, 0x9c, 0x80, 0x49, 0xea, 0x0c, 0x2b, 0x03, 0xf4, 0x9c, 0x59, 0xac, 0x24, 0x0d, 0x25,
+	0x0f, 0x58, 0x85, 0x70, 0xaf, 0x89, 0x20, 0xbc, 0x01, 0x0b, 0xe8, 0x34, 0xcf, 0xfe, 0x0c, 0xe0,
+	0xe5, 0x5d, 0x1e, 0xf2, 0x20, 0x0d, 0x08, 0x13, 0x51, 0x9a, 0x78, 0xec, 0x05, 0x4b, 0x04, 0x8f,
+	0x42, 0x74, 0x03, 0x2e, 0x08, 0x19, 0x25, 0x6c, 0xe7, 0x51, 0x17, 0x6c, 0x80, 0xcd, 0x25, 0x77,
+	0xe5, 0xf8, 0x6c, 0xbd, 0x95, 0x9d, 0xad, 0x2f, 0xec, 0xe7, 0x69, 0x32, 0xaa, 0xa3, 0x6d, 0xb8,
+	0x92, 0xfc, 0xc9, 0xee, 0x1a, 0x9a, 0xb2, 0x56, 0x50, 0x56, 0xa6, 0xc4, 0xc9, 0x34, 0xde, 0xfe,
+	0x64, 0xc0, 0xb9, 0x7d, 0x65, 0x35, 0x7a, 0x0d, 0x17, 0x95, 0x2d, 0x87, 0x54, 0x52, 0xdd, 0xd8,
+	0xec, 0xdf, 0xc6, 0x93, 0x7d, 0x8c, 0x4f, 0x87, 0xe3, 0x23, 0x5f, 0x25, 0x04, 0x56, 0x68, 0x3c,
+	0xdc, 0xc2, 0x7b, 0x07, 0x6f, 0x99, 0x27, 0x77, 0x99, 0xa4, 0x2e, 0x2a, 0xfa, 0xc2, 0x49, 0x8e,
+	0x8c, 0x55, 0xd1, 0x13, 0xd8, 0x11, 0x31, 0xf3, 0xf4, 0x8c, 0x66, 0xff, 0x1a, 0x9e, 0xbd, 0x6d,
+	0xac, 0x47, 0xda, 0x8f, 0x99, 0xe7, 0xfe, 0x57, 0x48, 0x76, 0x54, 0x44, 0xb4, 0x00, 0xda, 0x83,
+	0xf3, 0x42, 0x52, 0x99, 0x8a, 0x6e, 0x5b, 0x4b, 0x5d, 0x6f, 0x96, 0xd2, 0x70, 0x77, 0xb9, 0x10,
+	0x9b, 0xcf, 0x63, 0x52, 0xc8, 0xd8, 0xdf, 0x00, 0x5c, 0xd2, 0xb8, 0xa7, 0x5c, 0x48, 0xf4, 0xaa,
+	0xe2, 0x04, 0xfe, 0x3b, 0x27, 0x14, 0x5b, 0xfb, 0x70, 0xa9, 0xe8, 0xb3, 0x38, 0xca, 0x94, 0x5c,
+	0x78, 0x0c, 0xe7, 0xb8, 0x64, 0x81, 0xe8, 0x1a, 0x1b, 0xed, 0x4d, 0xb3, 0x7f, 0xb5, 0x71, 0x76,
+	0xf7, 0xff, 0x42, 0x6d, 0x6e, 0x47, 0xf1, 0x48, 0x4e, 0xb7, 0x1f, 0x14, 0x23, 0x2b, 0x5f, 0x10,
+	0x86, 0x30, 0xa4, 0x01, 0x13, 0x31, 0xf5, 0x98, 0xe8, 0x82, 0x8d, 0xf6, 0xe6, 0x92, 0xbb, 0xac,
+	0x16, 0xf1, 0x6c, 0x9c, 0x25, 0x25, 0x84, 0xfd, 0xcb, 0x80, 0x66, 0xc9, 0x18, 0x7d, 0xe9, 0x54,
+	0x58, 0x73, 0xe9, 0xf2, 0x34, 0x19, 0xd5, 0xa7, 0x5a, 0x19, 0x4d, 0xad, 0xd0, 0x17, 0x00, 0xd7,
+	0x82, 0xda, 0xab, 0xae, 0xd6, 0xa7, 0x2c, 0xe8, 0x5f, 0x64, 0x41, 0xfd, 0xbf, 0xc4, 0x5d, 0x2f,
+	0xe6, 0x5b, 0xab, 0xaf, 0x0b, 0x32, 0xab, 0x27, 0xfa, 0x00, 0x57, 0x05, 0x4b, 0x86, 0x2c, 0xd1,
+	0x27, 0x1b, 0x8f, 0xd2, 0xd1, 0xa3, 0xe0, 0x0b, 0xb7, 0x51, 0xa1, 0xb9, 0x57, 0x8a, 0x31, 0x56,
+	0xab, 0x35, 0x41, 0xea, 0xfa, 0xd8, 0x3f, 0x01, 0x44, 0x55, 0x30, 0xba, 0x0b, 0x4d, 0x1a, 0xf3,
+	0xbc, 0x30, 0x5e, 0xc2, 0x6a, 0xa1, 0x6e, 0x6e, 0x3f, 0xdf, 0x19, 0x95, 0x48, 0x19, 0x57, 0x7e,
+	0x2c, 0x8c, 0x86, 0xc7, 0xa2, 0xb4, 0xe2, 0x76, 0xc3, 0x8a, 0x6b, 0xde, 0x95, 0xce, 0xbf, 0xbd,
+	0x2b, 0xee, 0xc3, 0xe3, 0x73, 0xab, 0x75, 0x72, 0x6e, 0xb5, 0x4e, 0xcf, 0xad, 0xd6, 0xc7, 0xcc,
+	0x02, 0xc7, 0x99, 0x05, 0x4e, 0x32, 0x0b, 0x9c, 0x66, 0x16, 0xf8, 0x9e, 0x59, 0xe0, 0xeb, 0x0f,
+	0xab, 0xf5, 0xb2, 0x37, 0xfb, 0xe3, 0xf0, 0x3b, 0x00, 0x00, 0xff, 0xff, 0xb2, 0x54, 0xe2, 0x73,
+	0x39, 0x06, 0x00, 0x00,
 }
 
 func (m *MinimumResourceVersion) Marshal() (dAtA []byte, err error) {
@@ -301,7 +301,7 @@ func (m *MinimumResourceVersion) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *ScopeDefinition) Marshal() (dAtA []byte, err error) {
+func (m *Scope) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -311,12 +311,12 @@ func (m *ScopeDefinition) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ScopeDefinition) MarshalTo(dAtA []byte) (int, error) {
+func (m *Scope) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ScopeDefinition) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Scope) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -354,7 +354,7 @@ func (m *ScopeDefinition) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ScopeDefinitionList) Marshal() (dAtA []byte, err error) {
+func (m *ScopeList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -364,12 +364,12 @@ func (m *ScopeDefinitionList) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ScopeDefinitionList) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScopeList) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ScopeDefinitionList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScopeList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -401,7 +401,7 @@ func (m *ScopeDefinitionList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ScopeDefinitionSpec) Marshal() (dAtA []byte, err error) {
+func (m *ScopeSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -411,12 +411,12 @@ func (m *ScopeDefinitionSpec) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ScopeDefinitionSpec) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScopeSpec) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ScopeDefinitionSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScopeSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -433,7 +433,7 @@ func (m *ScopeDefinitionSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ScopeDefinitionStatus) Marshal() (dAtA []byte, err error) {
+func (m *ScopeStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -443,12 +443,12 @@ func (m *ScopeDefinitionStatus) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ScopeDefinitionStatus) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScopeStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ScopeDefinitionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScopeStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -565,7 +565,7 @@ func (m *MinimumResourceVersion) Size() (n int) {
 	return n
 }
 
-func (m *ScopeDefinition) Size() (n int) {
+func (m *Scope) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -580,7 +580,7 @@ func (m *ScopeDefinition) Size() (n int) {
 	return n
 }
 
-func (m *ScopeDefinitionList) Size() (n int) {
+func (m *ScopeList) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -597,7 +597,7 @@ func (m *ScopeDefinitionList) Size() (n int) {
 	return n
 }
 
-func (m *ScopeDefinitionSpec) Size() (n int) {
+func (m *ScopeSpec) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -612,7 +612,7 @@ func (m *ScopeDefinitionSpec) Size() (n int) {
 	return n
 }
 
-func (m *ScopeDefinitionStatus) Size() (n int) {
+func (m *ScopeStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -675,45 +675,45 @@ func (this *MinimumResourceVersion) String() string {
 	}, "")
 	return s
 }
-func (this *ScopeDefinition) String() string {
+func (this *Scope) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ScopeDefinition{`,
+	s := strings.Join([]string{`&Scope{`,
 		`ObjectMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ObjectMeta), "ObjectMeta", "v1.ObjectMeta", 1), `&`, ``, 1) + `,`,
-		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ScopeDefinitionSpec", "ScopeDefinitionSpec", 1), `&`, ``, 1) + `,`,
-		`Status:` + strings.Replace(strings.Replace(this.Status.String(), "ScopeDefinitionStatus", "ScopeDefinitionStatus", 1), `&`, ``, 1) + `,`,
+		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ScopeSpec", "ScopeSpec", 1), `&`, ``, 1) + `,`,
+		`Status:` + strings.Replace(strings.Replace(this.Status.String(), "ScopeStatus", "ScopeStatus", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *ScopeDefinitionList) String() string {
+func (this *ScopeList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForItems := "[]ScopeDefinition{"
+	repeatedStringForItems := "[]Scope{"
 	for _, f := range this.Items {
-		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "ScopeDefinition", "ScopeDefinition", 1), `&`, ``, 1) + ","
+		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "Scope", "Scope", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForItems += "}"
-	s := strings.Join([]string{`&ScopeDefinitionList{`,
+	s := strings.Join([]string{`&ScopeList{`,
 		`ListMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ListMeta), "ListMeta", "v1.ListMeta", 1), `&`, ``, 1) + `,`,
 		`Items:` + repeatedStringForItems + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *ScopeDefinitionSpec) String() string {
+func (this *ScopeSpec) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ScopeDefinitionSpec{`,
+	s := strings.Join([]string{`&ScopeSpec{`,
 		`Namespaces:` + fmt.Sprintf("%v", this.Namespaces) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *ScopeDefinitionStatus) String() string {
+func (this *ScopeStatus) String() string {
 	if this == nil {
 		return "nil"
 	}
@@ -727,7 +727,7 @@ func (this *ScopeDefinitionStatus) String() string {
 		repeatedStringForServerScopeVersions += strings.Replace(strings.Replace(f.String(), "ServerScopeVersion", "ServerScopeVersion", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForServerScopeVersions += "}"
-	s := strings.Join([]string{`&ScopeDefinitionStatus{`,
+	s := strings.Join([]string{`&ScopeStatus{`,
 		`ScopeID:` + fmt.Sprintf("%v", this.ScopeID) + `,`,
 		`Namespaces:` + fmt.Sprintf("%v", this.Namespaces) + `,`,
 		`MinimumResourceVersions:` + repeatedStringForMinimumResourceVersions + `,`,
@@ -871,7 +871,7 @@ func (m *MinimumResourceVersion) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ScopeDefinition) Unmarshal(dAtA []byte) error {
+func (m *Scope) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -894,10 +894,10 @@ func (m *ScopeDefinition) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ScopeDefinition: wiretype end group for non-group")
+			return fmt.Errorf("proto: Scope: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ScopeDefinition: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Scope: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1020,7 +1020,7 @@ func (m *ScopeDefinition) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ScopeDefinitionList) Unmarshal(dAtA []byte) error {
+func (m *ScopeList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1043,10 +1043,10 @@ func (m *ScopeDefinitionList) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ScopeDefinitionList: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScopeList: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ScopeDefinitionList: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScopeList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1111,7 +1111,7 @@ func (m *ScopeDefinitionList) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, ScopeDefinition{})
+			m.Items = append(m.Items, Scope{})
 			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1137,7 +1137,7 @@ func (m *ScopeDefinitionList) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ScopeDefinitionSpec) Unmarshal(dAtA []byte) error {
+func (m *ScopeSpec) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1160,10 +1160,10 @@ func (m *ScopeDefinitionSpec) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ScopeDefinitionSpec: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScopeSpec: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ScopeDefinitionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScopeSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1219,7 +1219,7 @@ func (m *ScopeDefinitionSpec) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ScopeDefinitionStatus) Unmarshal(dAtA []byte) error {
+func (m *ScopeStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1242,10 +1242,10 @@ func (m *ScopeDefinitionStatus) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ScopeDefinitionStatus: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScopeStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ScopeDefinitionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScopeStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

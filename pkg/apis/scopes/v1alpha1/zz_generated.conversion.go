@@ -47,43 +47,43 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeDefinition)(nil), (*scopes.ScopeDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ScopeDefinition_To_scopes_ScopeDefinition(a.(*v1alpha1.ScopeDefinition), b.(*scopes.ScopeDefinition), scope)
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.Scope)(nil), (*scopes.Scope)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_Scope_To_scopes_Scope(a.(*v1alpha1.Scope), b.(*scopes.Scope), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*scopes.ScopeDefinition)(nil), (*v1alpha1.ScopeDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_scopes_ScopeDefinition_To_v1alpha1_ScopeDefinition(a.(*scopes.ScopeDefinition), b.(*v1alpha1.ScopeDefinition), scope)
+	if err := s.AddGeneratedConversionFunc((*scopes.Scope)(nil), (*v1alpha1.Scope)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_scopes_Scope_To_v1alpha1_Scope(a.(*scopes.Scope), b.(*v1alpha1.Scope), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeDefinitionList)(nil), (*scopes.ScopeDefinitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ScopeDefinitionList_To_scopes_ScopeDefinitionList(a.(*v1alpha1.ScopeDefinitionList), b.(*scopes.ScopeDefinitionList), scope)
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeList)(nil), (*scopes.ScopeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ScopeList_To_scopes_ScopeList(a.(*v1alpha1.ScopeList), b.(*scopes.ScopeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*scopes.ScopeDefinitionList)(nil), (*v1alpha1.ScopeDefinitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_scopes_ScopeDefinitionList_To_v1alpha1_ScopeDefinitionList(a.(*scopes.ScopeDefinitionList), b.(*v1alpha1.ScopeDefinitionList), scope)
+	if err := s.AddGeneratedConversionFunc((*scopes.ScopeList)(nil), (*v1alpha1.ScopeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_scopes_ScopeList_To_v1alpha1_ScopeList(a.(*scopes.ScopeList), b.(*v1alpha1.ScopeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeDefinitionSpec)(nil), (*scopes.ScopeDefinitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec(a.(*v1alpha1.ScopeDefinitionSpec), b.(*scopes.ScopeDefinitionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeSpec)(nil), (*scopes.ScopeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec(a.(*v1alpha1.ScopeSpec), b.(*scopes.ScopeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*scopes.ScopeDefinitionSpec)(nil), (*v1alpha1.ScopeDefinitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec(a.(*scopes.ScopeDefinitionSpec), b.(*v1alpha1.ScopeDefinitionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*scopes.ScopeSpec)(nil), (*v1alpha1.ScopeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec(a.(*scopes.ScopeSpec), b.(*v1alpha1.ScopeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeDefinitionStatus)(nil), (*scopes.ScopeDefinitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(a.(*v1alpha1.ScopeDefinitionStatus), b.(*scopes.ScopeDefinitionStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*v1alpha1.ScopeStatus)(nil), (*scopes.ScopeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus(a.(*v1alpha1.ScopeStatus), b.(*scopes.ScopeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*scopes.ScopeDefinitionStatus)(nil), (*v1alpha1.ScopeDefinitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(a.(*scopes.ScopeDefinitionStatus), b.(*v1alpha1.ScopeDefinitionStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*scopes.ScopeStatus)(nil), (*v1alpha1.ScopeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus(a.(*scopes.ScopeStatus), b.(*v1alpha1.ScopeStatus), scope)
 	}); err != nil {
 		return err
 	}
@@ -122,81 +122,81 @@ func Convert_scopes_MinimumResourceVersion_To_v1alpha1_MinimumResourceVersion(in
 	return autoConvert_scopes_MinimumResourceVersion_To_v1alpha1_MinimumResourceVersion(in, out, s)
 }
 
-func autoConvert_v1alpha1_ScopeDefinition_To_scopes_ScopeDefinition(in *v1alpha1.ScopeDefinition, out *scopes.ScopeDefinition, s conversion.Scope) error {
+func autoConvert_v1alpha1_Scope_To_scopes_Scope(in *v1alpha1.Scope, out *scopes.Scope, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec(&in.Spec, &out.Spec, s); err != nil {
+	if err := Convert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
-	if err := Convert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(&in.Status, &out.Status, s); err != nil {
+	if err := Convert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus(&in.Status, &out.Status, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_v1alpha1_ScopeDefinition_To_scopes_ScopeDefinition is an autogenerated conversion function.
-func Convert_v1alpha1_ScopeDefinition_To_scopes_ScopeDefinition(in *v1alpha1.ScopeDefinition, out *scopes.ScopeDefinition, s conversion.Scope) error {
-	return autoConvert_v1alpha1_ScopeDefinition_To_scopes_ScopeDefinition(in, out, s)
+// Convert_v1alpha1_Scope_To_scopes_Scope is an autogenerated conversion function.
+func Convert_v1alpha1_Scope_To_scopes_Scope(in *v1alpha1.Scope, out *scopes.Scope, s conversion.Scope) error {
+	return autoConvert_v1alpha1_Scope_To_scopes_Scope(in, out, s)
 }
 
-func autoConvert_scopes_ScopeDefinition_To_v1alpha1_ScopeDefinition(in *scopes.ScopeDefinition, out *v1alpha1.ScopeDefinition, s conversion.Scope) error {
+func autoConvert_scopes_Scope_To_v1alpha1_Scope(in *scopes.Scope, out *v1alpha1.Scope, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec(&in.Spec, &out.Spec, s); err != nil {
+	if err := Convert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
-	if err := Convert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(&in.Status, &out.Status, s); err != nil {
+	if err := Convert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus(&in.Status, &out.Status, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_scopes_ScopeDefinition_To_v1alpha1_ScopeDefinition is an autogenerated conversion function.
-func Convert_scopes_ScopeDefinition_To_v1alpha1_ScopeDefinition(in *scopes.ScopeDefinition, out *v1alpha1.ScopeDefinition, s conversion.Scope) error {
-	return autoConvert_scopes_ScopeDefinition_To_v1alpha1_ScopeDefinition(in, out, s)
+// Convert_scopes_Scope_To_v1alpha1_Scope is an autogenerated conversion function.
+func Convert_scopes_Scope_To_v1alpha1_Scope(in *scopes.Scope, out *v1alpha1.Scope, s conversion.Scope) error {
+	return autoConvert_scopes_Scope_To_v1alpha1_Scope(in, out, s)
 }
 
-func autoConvert_v1alpha1_ScopeDefinitionList_To_scopes_ScopeDefinitionList(in *v1alpha1.ScopeDefinitionList, out *scopes.ScopeDefinitionList, s conversion.Scope) error {
+func autoConvert_v1alpha1_ScopeList_To_scopes_ScopeList(in *v1alpha1.ScopeList, out *scopes.ScopeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]scopes.ScopeDefinition)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]scopes.Scope)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
-// Convert_v1alpha1_ScopeDefinitionList_To_scopes_ScopeDefinitionList is an autogenerated conversion function.
-func Convert_v1alpha1_ScopeDefinitionList_To_scopes_ScopeDefinitionList(in *v1alpha1.ScopeDefinitionList, out *scopes.ScopeDefinitionList, s conversion.Scope) error {
-	return autoConvert_v1alpha1_ScopeDefinitionList_To_scopes_ScopeDefinitionList(in, out, s)
+// Convert_v1alpha1_ScopeList_To_scopes_ScopeList is an autogenerated conversion function.
+func Convert_v1alpha1_ScopeList_To_scopes_ScopeList(in *v1alpha1.ScopeList, out *scopes.ScopeList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ScopeList_To_scopes_ScopeList(in, out, s)
 }
 
-func autoConvert_scopes_ScopeDefinitionList_To_v1alpha1_ScopeDefinitionList(in *scopes.ScopeDefinitionList, out *v1alpha1.ScopeDefinitionList, s conversion.Scope) error {
+func autoConvert_scopes_ScopeList_To_v1alpha1_ScopeList(in *scopes.ScopeList, out *v1alpha1.ScopeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.ScopeDefinition)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]v1alpha1.Scope)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
-// Convert_scopes_ScopeDefinitionList_To_v1alpha1_ScopeDefinitionList is an autogenerated conversion function.
-func Convert_scopes_ScopeDefinitionList_To_v1alpha1_ScopeDefinitionList(in *scopes.ScopeDefinitionList, out *v1alpha1.ScopeDefinitionList, s conversion.Scope) error {
-	return autoConvert_scopes_ScopeDefinitionList_To_v1alpha1_ScopeDefinitionList(in, out, s)
+// Convert_scopes_ScopeList_To_v1alpha1_ScopeList is an autogenerated conversion function.
+func Convert_scopes_ScopeList_To_v1alpha1_ScopeList(in *scopes.ScopeList, out *v1alpha1.ScopeList, s conversion.Scope) error {
+	return autoConvert_scopes_ScopeList_To_v1alpha1_ScopeList(in, out, s)
 }
 
-func autoConvert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec(in *v1alpha1.ScopeDefinitionSpec, out *scopes.ScopeDefinitionSpec, s conversion.Scope) error {
+func autoConvert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec(in *v1alpha1.ScopeSpec, out *scopes.ScopeSpec, s conversion.Scope) error {
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	return nil
 }
 
-// Convert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec is an autogenerated conversion function.
-func Convert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec(in *v1alpha1.ScopeDefinitionSpec, out *scopes.ScopeDefinitionSpec, s conversion.Scope) error {
-	return autoConvert_v1alpha1_ScopeDefinitionSpec_To_scopes_ScopeDefinitionSpec(in, out, s)
+// Convert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec is an autogenerated conversion function.
+func Convert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec(in *v1alpha1.ScopeSpec, out *scopes.ScopeSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ScopeSpec_To_scopes_ScopeSpec(in, out, s)
 }
 
-func autoConvert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec(in *scopes.ScopeDefinitionSpec, out *v1alpha1.ScopeDefinitionSpec, s conversion.Scope) error {
+func autoConvert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec(in *scopes.ScopeSpec, out *v1alpha1.ScopeSpec, s conversion.Scope) error {
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	return nil
 }
 
-// Convert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec is an autogenerated conversion function.
-func Convert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec(in *scopes.ScopeDefinitionSpec, out *v1alpha1.ScopeDefinitionSpec, s conversion.Scope) error {
-	return autoConvert_scopes_ScopeDefinitionSpec_To_v1alpha1_ScopeDefinitionSpec(in, out, s)
+// Convert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec is an autogenerated conversion function.
+func Convert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec(in *scopes.ScopeSpec, out *v1alpha1.ScopeSpec, s conversion.Scope) error {
+	return autoConvert_scopes_ScopeSpec_To_v1alpha1_ScopeSpec(in, out, s)
 }
 
-func autoConvert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(in *v1alpha1.ScopeDefinitionStatus, out *scopes.ScopeDefinitionStatus, s conversion.Scope) error {
+func autoConvert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus(in *v1alpha1.ScopeStatus, out *scopes.ScopeStatus, s conversion.Scope) error {
 	out.ScopeID = in.ScopeID
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	out.MinimumResourceVersions = *(*[]scopes.MinimumResourceVersion)(unsafe.Pointer(&in.MinimumResourceVersions))
@@ -204,12 +204,12 @@ func autoConvert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(
 	return nil
 }
 
-// Convert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus is an autogenerated conversion function.
-func Convert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(in *v1alpha1.ScopeDefinitionStatus, out *scopes.ScopeDefinitionStatus, s conversion.Scope) error {
-	return autoConvert_v1alpha1_ScopeDefinitionStatus_To_scopes_ScopeDefinitionStatus(in, out, s)
+// Convert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus is an autogenerated conversion function.
+func Convert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus(in *v1alpha1.ScopeStatus, out *scopes.ScopeStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_ScopeStatus_To_scopes_ScopeStatus(in, out, s)
 }
 
-func autoConvert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(in *scopes.ScopeDefinitionStatus, out *v1alpha1.ScopeDefinitionStatus, s conversion.Scope) error {
+func autoConvert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus(in *scopes.ScopeStatus, out *v1alpha1.ScopeStatus, s conversion.Scope) error {
 	out.ScopeID = in.ScopeID
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	out.MinimumResourceVersions = *(*[]v1alpha1.MinimumResourceVersion)(unsafe.Pointer(&in.MinimumResourceVersions))
@@ -217,9 +217,9 @@ func autoConvert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(
 	return nil
 }
 
-// Convert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus is an autogenerated conversion function.
-func Convert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(in *scopes.ScopeDefinitionStatus, out *v1alpha1.ScopeDefinitionStatus, s conversion.Scope) error {
-	return autoConvert_scopes_ScopeDefinitionStatus_To_v1alpha1_ScopeDefinitionStatus(in, out, s)
+// Convert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus is an autogenerated conversion function.
+func Convert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus(in *scopes.ScopeStatus, out *v1alpha1.ScopeStatus, s conversion.Scope) error {
+	return autoConvert_scopes_ScopeStatus_To_v1alpha1_ScopeStatus(in, out, s)
 }
 
 func autoConvert_v1alpha1_ServerScopeVersion_To_scopes_ServerScopeVersion(in *v1alpha1.ServerScopeVersion, out *scopes.ServerScopeVersion, s conversion.Scope) error {

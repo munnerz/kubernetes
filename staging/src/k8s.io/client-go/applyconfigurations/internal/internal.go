@@ -12779,7 +12779,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: io.k8s.api.scopes.v1alpha1.ScopeDefinition
+- name: io.k8s.api.scopes.v1alpha1.Scope
   map:
     fields:
     - name: apiVersion
@@ -12794,13 +12794,13 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
+        namedType: io.k8s.api.scopes.v1alpha1.ScopeSpec
       default: {}
     - name: status
       type:
-        namedType: io.k8s.api.scopes.v1alpha1.ScopeDefinitionStatus
+        namedType: io.k8s.api.scopes.v1alpha1.ScopeStatus
       default: {}
-- name: io.k8s.api.scopes.v1alpha1.ScopeDefinitionSpec
+- name: io.k8s.api.scopes.v1alpha1.ScopeSpec
   map:
     fields:
     - name: namespaces
@@ -12809,7 +12809,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             scalar: string
           elementRelationship: associative
-- name: io.k8s.api.scopes.v1alpha1.ScopeDefinitionStatus
+- name: io.k8s.api.scopes.v1alpha1.ScopeStatus
   map:
     fields:
     - name: minimumResourceVersions

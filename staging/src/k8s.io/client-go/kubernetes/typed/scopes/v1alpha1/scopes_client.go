@@ -28,7 +28,7 @@ import (
 
 type ScopesV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	ScopeDefinitionsGetter
+	ScopesGetter
 }
 
 // ScopesV1alpha1Client is used to interact with features provided by the scopes.k8s.io group.
@@ -36,8 +36,8 @@ type ScopesV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *ScopesV1alpha1Client) ScopeDefinitions() ScopeDefinitionInterface {
-	return newScopeDefinitions(c)
+func (c *ScopesV1alpha1Client) Scopes() ScopeInterface {
+	return newScopes(c)
 }
 
 // NewForConfig creates a new ScopesV1alpha1Client for the given config.

@@ -27,56 +27,56 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// ScopeDefinitionApplyConfiguration represents a declarative configuration of the ScopeDefinition type for use
+// ScopeApplyConfiguration represents a declarative configuration of the Scope type for use
 // with apply.
-type ScopeDefinitionApplyConfiguration struct {
+type ScopeApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *ScopeDefinitionSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *ScopeDefinitionStatusApplyConfiguration `json:"status,omitempty"`
+	Spec                             *ScopeSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                           *ScopeStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// ScopeDefinition constructs a declarative configuration of the ScopeDefinition type for use with
+// Scope constructs a declarative configuration of the Scope type for use with
 // apply.
-func ScopeDefinition(name string) *ScopeDefinitionApplyConfiguration {
-	b := &ScopeDefinitionApplyConfiguration{}
+func Scope(name string) *ScopeApplyConfiguration {
+	b := &ScopeApplyConfiguration{}
 	b.WithName(name)
-	b.WithKind("ScopeDefinition")
+	b.WithKind("Scope")
 	b.WithAPIVersion("scopes.k8s.io/v1alpha1")
 	return b
 }
 
-// ExtractScopeDefinition extracts the applied configuration owned by fieldManager from
-// scopeDefinition. If no managedFields are found in scopeDefinition for fieldManager, a
-// ScopeDefinitionApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// ExtractScope extracts the applied configuration owned by fieldManager from
+// scope. If no managedFields are found in scope for fieldManager, a
+// ScopeApplyConfiguration is returned with only the Name, Namespace (if applicable),
 // APIVersion and Kind populated. It is possible that no managed fields were found for because other
 // field managers have taken ownership of all the fields previously owned by fieldManager, or because
 // the fieldManager never owned fields any fields.
-// scopeDefinition must be a unmodified ScopeDefinition API object that was retrieved from the Kubernetes API.
-// ExtractScopeDefinition provides a way to perform a extract/modify-in-place/apply workflow.
+// scope must be a unmodified Scope API object that was retrieved from the Kubernetes API.
+// ExtractScope provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractScopeDefinition(scopeDefinition *scopesv1alpha1.ScopeDefinition, fieldManager string) (*ScopeDefinitionApplyConfiguration, error) {
-	return extractScopeDefinition(scopeDefinition, fieldManager, "")
+func ExtractScope(scope *scopesv1alpha1.Scope, fieldManager string) (*ScopeApplyConfiguration, error) {
+	return extractScope(scope, fieldManager, "")
 }
 
-// ExtractScopeDefinitionStatus is the same as ExtractScopeDefinition except
+// ExtractScopeStatus is the same as ExtractScope except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractScopeDefinitionStatus(scopeDefinition *scopesv1alpha1.ScopeDefinition, fieldManager string) (*ScopeDefinitionApplyConfiguration, error) {
-	return extractScopeDefinition(scopeDefinition, fieldManager, "status")
+func ExtractScopeStatus(scope *scopesv1alpha1.Scope, fieldManager string) (*ScopeApplyConfiguration, error) {
+	return extractScope(scope, fieldManager, "status")
 }
 
-func extractScopeDefinition(scopeDefinition *scopesv1alpha1.ScopeDefinition, fieldManager string, subresource string) (*ScopeDefinitionApplyConfiguration, error) {
-	b := &ScopeDefinitionApplyConfiguration{}
-	err := managedfields.ExtractInto(scopeDefinition, internal.Parser().Type("io.k8s.api.scopes.v1alpha1.ScopeDefinition"), fieldManager, b, subresource)
+func extractScope(scope *scopesv1alpha1.Scope, fieldManager string, subresource string) (*ScopeApplyConfiguration, error) {
+	b := &ScopeApplyConfiguration{}
+	err := managedfields.ExtractInto(scope, internal.Parser().Type("io.k8s.api.scopes.v1alpha1.Scope"), fieldManager, b, subresource)
 	if err != nil {
 		return nil, err
 	}
-	b.WithName(scopeDefinition.Name)
+	b.WithName(scope.Name)
 
-	b.WithKind("ScopeDefinition")
+	b.WithKind("Scope")
 	b.WithAPIVersion("scopes.k8s.io/v1alpha1")
 	return b, nil
 }
@@ -84,7 +84,7 @@ func extractScopeDefinition(scopeDefinition *scopesv1alpha1.ScopeDefinition, fie
 // WithKind sets the Kind field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithKind(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithKind(value string) *ScopeApplyConfiguration {
 	b.Kind = &value
 	return b
 }
@@ -92,7 +92,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithKind(value string) *ScopeDefinit
 // WithAPIVersion sets the APIVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithAPIVersion(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithAPIVersion(value string) *ScopeApplyConfiguration {
 	b.APIVersion = &value
 	return b
 }
@@ -100,7 +100,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithAPIVersion(value string) *ScopeD
 // WithName sets the Name field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Name field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithName(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithName(value string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Name = &value
 	return b
@@ -109,7 +109,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithName(value string) *ScopeDefinit
 // WithGenerateName sets the GenerateName field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the GenerateName field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithGenerateName(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithGenerateName(value string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.GenerateName = &value
 	return b
@@ -118,7 +118,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithGenerateName(value string) *Scop
 // WithNamespace sets the Namespace field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Namespace field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithNamespace(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithNamespace(value string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Namespace = &value
 	return b
@@ -127,7 +127,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithNamespace(value string) *ScopeDe
 // WithUID sets the UID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the UID field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithUID(value types.UID) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithUID(value types.UID) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.UID = &value
 	return b
@@ -136,7 +136,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithUID(value types.UID) *ScopeDefin
 // WithResourceVersion sets the ResourceVersion field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithResourceVersion(value string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithResourceVersion(value string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.ResourceVersion = &value
 	return b
@@ -145,7 +145,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithResourceVersion(value string) *S
 // WithGeneration sets the Generation field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Generation field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithGeneration(value int64) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithGeneration(value int64) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.Generation = &value
 	return b
@@ -154,7 +154,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithGeneration(value int64) *ScopeDe
 // WithCreationTimestamp sets the CreationTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithCreationTimestamp(value metav1.Time) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithCreationTimestamp(value metav1.Time) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.CreationTimestamp = &value
 	return b
@@ -163,7 +163,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithCreationTimestamp(value metav1.T
 // WithDeletionTimestamp sets the DeletionTimestamp field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionTimestamp = &value
 	return b
@@ -172,7 +172,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithDeletionTimestamp(value metav1.T
 // WithDeletionGracePeriodSeconds sets the DeletionGracePeriodSeconds field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	b.DeletionGracePeriodSeconds = &value
 	return b
@@ -182,7 +182,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithDeletionGracePeriodSeconds(value
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Labels field,
 // overwriting an existing map entries in Labels field with the same key.
-func (b *ScopeDefinitionApplyConfiguration) WithLabels(entries map[string]string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithLabels(entries map[string]string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Labels == nil && len(entries) > 0 {
 		b.Labels = make(map[string]string, len(entries))
@@ -197,7 +197,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithLabels(entries map[string]string
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, the entries provided by each call will be put on the Annotations field,
 // overwriting an existing map entries in Annotations field with the same key.
-func (b *ScopeDefinitionApplyConfiguration) WithAnnotations(entries map[string]string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithAnnotations(entries map[string]string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	if b.Annotations == nil && len(entries) > 0 {
 		b.Annotations = make(map[string]string, len(entries))
@@ -211,7 +211,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithAnnotations(entries map[string]s
 // WithOwnerReferences adds the given value to the OwnerReferences field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the OwnerReferences field.
-func (b *ScopeDefinitionApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithOwnerReferences(values ...*v1.OwnerReferenceApplyConfiguration) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		if values[i] == nil {
@@ -225,7 +225,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithOwnerReferences(values ...*v1.Ow
 // WithFinalizers adds the given value to the Finalizers field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Finalizers field.
-func (b *ScopeDefinitionApplyConfiguration) WithFinalizers(values ...string) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithFinalizers(values ...string) *ScopeApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
 		b.Finalizers = append(b.Finalizers, values[i])
@@ -233,7 +233,7 @@ func (b *ScopeDefinitionApplyConfiguration) WithFinalizers(values ...string) *Sc
 	return b
 }
 
-func (b *ScopeDefinitionApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
+func (b *ScopeApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
@@ -242,7 +242,7 @@ func (b *ScopeDefinitionApplyConfiguration) ensureObjectMetaApplyConfigurationEx
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithSpec(value *ScopeDefinitionSpecApplyConfiguration) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithSpec(value *ScopeSpecApplyConfiguration) *ScopeApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -250,13 +250,13 @@ func (b *ScopeDefinitionApplyConfiguration) WithSpec(value *ScopeDefinitionSpecA
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *ScopeDefinitionApplyConfiguration) WithStatus(value *ScopeDefinitionStatusApplyConfiguration) *ScopeDefinitionApplyConfiguration {
+func (b *ScopeApplyConfiguration) WithStatus(value *ScopeStatusApplyConfiguration) *ScopeApplyConfiguration {
 	b.Status = value
 	return b
 }
 
 // GetName retrieves the value of the Name field in the declarative configuration.
-func (b *ScopeDefinitionApplyConfiguration) GetName() *string {
+func (b *ScopeApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.Name
 }

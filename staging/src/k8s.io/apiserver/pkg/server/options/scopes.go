@@ -159,7 +159,7 @@ func (s *RequestScopingOptions) getClient(clientConfig *rest.Config) (kubernetes
 
 const emptyResourcePrefix = "/_empty"
 
-var scopeResource = scopesv1alpha1.Resource("scopes")
+var scopeResource = scopesv1alpha1.Resource("scope sts")
 
 func newScope() runtime.Object     { return &scopesinternal.Scope{} }
 func newScopeList() runtime.Object { return &scopesinternal.ScopeList{} }
