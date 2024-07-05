@@ -704,10 +704,10 @@ func AddHandlers(h printers.PrintHandler) {
 
 	scopeDefinitionColumnDefinitions := []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
-		{Name: "Namespaces", Type: "string", Description: scopesv1alpha1.ScopeDefinitionSpec{}.SwaggerDoc()["namespaces"]},
+		{Name: "Namespaces", Type: "string", Description: scopesv1alpha1.ScopeSpec{}.SwaggerDoc()["namespaces"]},
 	}
-	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScopeDefinition)
-	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScopeDefinitionList)
+	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScope)
+	_ = h.TableHandler(scopeDefinitionColumnDefinitions, printScopeList)
 }
 
 // Pass ports=nil for all ports.
@@ -3160,7 +3160,7 @@ func printStorageVersionMigrationList(list *svmv1alpha1.StorageVersionMigrationL
 	return rows, nil
 }
 
-func printScopeDefinition(obj *scopes.ScopeDefinition, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+func printScope(obj *scopes.Scope, options printers.GenerateOptions) ([]metav1.TableRow, error) {
 	row := metav1.TableRow{
 		Object: runtime.RawExtension{Object: obj},
 	}
@@ -3171,11 +3171,11 @@ func printScopeDefinition(obj *scopes.ScopeDefinition, options printers.Generate
 	return []metav1.TableRow{row}, nil
 }
 
-func printScopeDefinitionList(list *scopes.ScopeDefinitionList, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+func printScopeList(list *scopes.ScopeList, options printers.GenerateOptions) ([]metav1.TableRow, error) {
 	rows := make([]metav1.TableRow, 0, len(list.Items))
 
 	for i := range list.Items {
-		r, err := printScopeDefinition(&list.Items[i], options)
+		r, err := printScope(&list.Items[i], options)
 		if err != nil {
 			return nil, err
 		}

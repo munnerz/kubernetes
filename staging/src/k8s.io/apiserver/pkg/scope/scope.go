@@ -23,8 +23,8 @@ func (s *value) Value() string {
 	return s.value
 }
 
-// DefinitionName returns the constructed ScopeDefinition name for a given Value.
-func DefinitionName(s ScopeValue) string {
+// ObjectName returns the constructed Scope name for a given Value.
+func ObjectName(s ScopeValue) string {
 	return s.Name() + ":" + s.Value()
 }
 

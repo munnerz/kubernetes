@@ -290,7 +290,7 @@ const (
 	//
 	// Allow using the ?scope=X query parameter to offer a mechanism to scope
 	// cluster-scoped requests to a limited set of namespaces defined
-	// in ScopeDefinition objects.
+	// in Scope objects.
 	RequestScoping featuregate.Feature = "RequestScoping"
 )
 

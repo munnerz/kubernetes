@@ -27,16 +27,16 @@ const (
 	controllerName = "request_scope_resolver"
 )
 
-// NewScopeDefinitionResolver creates a new Resolver that resolves scopes to a list of
+// NewScopeResolver creates a new Resolver that resolves scopes to a list of
 // namespaces by querying a lister for the currently configured mapping.
-func NewScopeDefinitionResolver(apiServerID string, storeMapper ResourceStoreMapper, clientset kubernetes.Interface, scopeDefinitionInformer scopesinformers.ScopeDefinitionInformer) (*DefaultScopeResolver, error) {
+func NewScopeResolver(apiServerID string, storeMapper ResourceStoreMapper, clientset kubernetes.Interface, scopeInformer scopesinformers.ScopeInformer) (*DefaultScopeResolver, error) {
 	r := &DefaultScopeResolver{
-		apiServerID:           apiServerID,
-		scopes:                make(map[string]map[string]*scope),
-		clientset:             clientset,
-		lister:                scopeDefinitionInformer.Lister(),
-		storeMapper:           storeMapper,
-		scopeDefinitionSynced: scopeDefinitionInformer.Informer().HasSynced,
+		apiServerID: apiServerID,
+		scopes:      make(map[string]map[string]*scope),
+		clientset:   clientset,
+		lister:      scopeInformer.Lister(),
+		storeMapper: storeMapper,
+		scopeSynced: scopeInformer.Informer().HasSynced,
 		queue: workqueue.NewTypedRateLimitingQueueWithConfig(
 			workqueue.DefaultTypedControllerRateLimiter[string](),
 			workqueue.TypedRateLimitingQueueConfig[string]{
@@ -44,7 +44,7 @@ func NewScopeDefinitionResolver(apiServerID string, storeMapper ResourceStoreMap
 			},
 		),
 	}
-	scopeDefinitionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	scopeInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: r.enqueue,
 		UpdateFunc: func(_, newObj interface{}) {
 			r.enqueue(newObj)
@@ -84,19 +84,19 @@ type DefaultScopeResolver struct {
 	versioner   storage.Versioner
 
 	// controller related fields
-	lister                scopeslisters.ScopeDefinitionLister
-	scopeDefinitionSynced cache.InformerSynced
-	queue                 workqueue.TypedRateLimitingInterface[string]
+	lister      scopeslisters.ScopeLister
+	scopeSynced cache.InformerSynced
+	queue       workqueue.TypedRateLimitingInterface[string]
 }
 
 // Resolve converts a (name, value) pair for a scope into a Scope object by reading the scope
-// from the internally maintained mapping, mirrored from ScopeDefinition objects.
+// from the internally maintained mapping, mirrored from Scope objects.
 func (r *DefaultScopeResolver) Resolve(ctx context.Context, name, value string) (Scope, error) {
 
 	return r.readScope(name, value)
 }
 
-// enqueue expects to be called with ScopeDefinition objects
+// enqueue expects to be called with Scope objects
 func (r *DefaultScopeResolver) enqueue(obj interface{}) {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
@@ -115,7 +115,7 @@ func (r *DefaultScopeResolver) Run(ctx context.Context) {
 
 	logger.Info("Starting scope resolver controller")
 
-	if !cache.WaitForCacheSync(ctx.Done(), r.scopeDefinitionSynced) {
+	if !cache.WaitForCacheSync(ctx.Done(), r.scopeSynced) {
 		utilruntime.HandleError(fmt.Errorf("timed out waiting for caches to sync"))
 		return
 	}
@@ -156,7 +156,7 @@ func (r *DefaultScopeResolver) process(ctx context.Context, key string) error {
 		}
 		return err
 	}
-	logger := klog.FromContext(ctx).WithValues("scopedefinition", def, "scope_id", def.Status.ScopeID)
+	logger := klog.FromContext(ctx).WithValues("scope", def, "scope_id", def.Status.ScopeID)
 	parts := strings.SplitN(def.Name, ":", 2)
 	scopeName, scopeValue := parts[0], parts[1]
 	// check if we already have an entry for this scope name
@@ -206,18 +206,18 @@ func (r *DefaultScopeResolver) process(ctx context.Context, key string) error {
 			ResourceVersion: strconv.FormatUint(rv, 10),
 		})
 	}
-	if _, err := r.clientset.ScopesV1alpha1().ScopeDefinitions().UpdateStatus(ctx, def, metav1.UpdateOptions{}); err != nil {
+	if _, err := r.clientset.ScopesV1alpha1().Scopes().UpdateStatus(ctx, def, metav1.UpdateOptions{}); err != nil {
 		// if an error occurs, clear the existing stored scope, expire the new one and retry
 		r.writeScope(scopeName, scopeValue, nil)
 		// this message is tailored to existing 'watch' users so contains less detail
 		newScope.expire(fmt.Errorf("internal error"))
-		return fmt.Errorf("failed to update status for scopedefinition %q: %w", def.Name, err)
+		return fmt.Errorf("failed to update status for Scope %q: %w", def.Name, err)
 	}
 	logger.V(4).Info("Updated Scope configuration", "old_scope_id", existingScope.Identifier())
 	return nil
 }
 
-func (r *DefaultScopeResolver) writeScope(name, value string, def *scopesv1alpha1.ScopeDefinition) *scope {
+func (r *DefaultScopeResolver) writeScope(name, value string, def *scopesv1alpha1.Scope) *scope {
 	r.scopesLock.Lock()
 	defer r.scopesLock.Unlock()
 	clear := def == nil
@@ -251,7 +251,7 @@ func (r *DefaultScopeResolver) readScope(name, value string) (*scope, error) {
 	return scope, nil
 }
 
-func (r *DefaultScopeResolver) buildExpiringScope(def *scopesv1alpha1.ScopeDefinition) *scope {
+func (r *DefaultScopeResolver) buildExpiringScope(def *scopesv1alpha1.Scope) *scope {
 	if def == nil {
 		return nil
 	}
@@ -272,7 +272,7 @@ func (r *DefaultScopeResolver) minimumResourceVersion(scope Scope, resource sche
 	if err != nil {
 		return 0, err
 	}
-	def, err := r.lister.Get(DefinitionName(scope))
+	def, err := r.lister.Get(ObjectName(scope))
 	if err != nil {
 		return 0, err
 	}

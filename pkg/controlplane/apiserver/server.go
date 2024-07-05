@@ -44,7 +44,7 @@ import (
 	"k8s.io/kubernetes/pkg/controlplane/controller/clusterauthenticationtrust"
 	"k8s.io/kubernetes/pkg/controlplane/controller/leaderelection"
 	"k8s.io/kubernetes/pkg/controlplane/controller/legacytokentracking"
-	"k8s.io/kubernetes/pkg/controlplane/controller/scopedefinition"
+	"k8s.io/kubernetes/pkg/controlplane/controller/requestscoping"
 	"k8s.io/kubernetes/pkg/controlplane/controller/systemnamespaces"
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/routes"
@@ -278,11 +278,11 @@ func (c completedConfig) New(name string, delegationTarget genericapiserver.Dele
 	})
 
 	if utilfeature.DefaultFeatureGate.Enabled(apiserverfeatures.RequestScoping) {
-		s.GenericAPIServer.AddPostStartHookOrDie("scopes/start-scopedefinition-status-controller", func(hookContext genericapiserver.PostStartHookContext) error {
-			go scopedefinition.NewScopeDefinitionController(
+		s.GenericAPIServer.AddPostStartHookOrDie("scopes/start-scopes-controller", func(hookContext genericapiserver.PostStartHookContext) error {
+			go requestscoping.NewScopeController(
 				hookContext.Context,
 				client,
-				s.VersionedInformers.Scopes().V1alpha1().ScopeDefinitions(),
+				s.VersionedInformers.Scopes().V1alpha1().Scopes(),
 			).Run(hookContext.Context)
 			return nil
 		})

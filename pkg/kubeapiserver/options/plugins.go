@@ -95,7 +95,7 @@ var AllOrderedPlugins = []string{
 	defaultingressclass.PluginName,          // DefaultIngressClass
 	denyserviceexternalips.PluginName,       // DenyServiceExternalIPs
 	labeler.PluginName,                      // NamespaceLabeler
-	scopes.PluginName,                       // ScopeDefinition
+	scopes.PluginName,                       // Scope
 
 	// new admission plugins should generally be inserted above here
 	// webhook, resourcequota, and deny plugins must go at the end

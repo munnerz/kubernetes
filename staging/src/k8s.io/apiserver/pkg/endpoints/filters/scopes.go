@@ -114,6 +114,7 @@ func parseScope(req *http.Request) (string, string, string, bool, error) {
 	if scopeValue == "" {
 		return "", "", "", true, fmt.Errorf("no scope value specified")
 	}
-	// todo: validate the value is a valid ScopeDefinition name (dns label?)
+	// todo: validate the name is a valid Scope name (dns label?)
+	// todo: validate the value is a valid Scope value (dns label?)
 	return scopeName, scopeValue, "/" + urlPath[4], true, nil
 }

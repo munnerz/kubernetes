@@ -1,4 +1,4 @@
-package scopedefinition
+package requestscoping
 
 import (
 	"context"
@@ -19,30 +19,30 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// Controller watches ScopeDefinition objects and updates their status accordingly.
+// Controller watches Scope objects and updates their status accordingly.
 type Controller struct {
 	clientset kubernetes.Interface
 
-	scopeDefinitionLister scopeslisters.ScopeDefinitionLister
+	scopeDefinitionLister scopeslisters.ScopeLister
 	scopeDefinitionSynced cache.InformerSynced
 
 	queue workqueue.TypedRateLimitingInterface[string]
 }
 
-// NewScopeDefinitionController creates a new Controller that handles computing and updating ScopeDefinition objects.
-func NewScopeDefinitionController(ctx context.Context, clientset kubernetes.Interface, scopeDefinitionInformer scopesinformers.ScopeDefinitionInformer) *Controller {
+// NewScopeController creates a new Controller that handles computing and updating Scope objects.
+func NewScopeController(ctx context.Context, clientset kubernetes.Interface, scopeInformer scopesinformers.ScopeInformer) *Controller {
 	c := &Controller{
 		clientset:             clientset,
-		scopeDefinitionLister: scopeDefinitionInformer.Lister(),
-		scopeDefinitionSynced: scopeDefinitionInformer.Informer().HasSynced,
+		scopeDefinitionLister: scopeInformer.Lister(),
+		scopeDefinitionSynced: scopeInformer.Informer().HasSynced,
 		queue: workqueue.NewTypedRateLimitingQueueWithConfig(
 			workqueue.DefaultTypedControllerRateLimiter[string](),
 			workqueue.TypedRateLimitingQueueConfig[string]{
-				Name: "scopedefinition_controller",
+				Name: "scope_controller",
 			},
 		),
 	}
-	scopeDefinitionInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	scopeInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueue,
 		UpdateFunc: func(_, newObj interface{}) {
 			c.enqueue(newObj)
@@ -129,9 +129,9 @@ func (c *Controller) process(ctx context.Context, key string) error {
 	// perform a deep-copy as we don't want to mutate cache items
 	def = def.DeepCopy()
 	def.Status.Namespaces = newNamespaces
-	if _, err := c.clientset.ScopesV1alpha1().ScopeDefinitions().UpdateStatus(ctx, def, metav1.UpdateOptions{}); err != nil {
+	if _, err := c.clientset.ScopesV1alpha1().Scopes().UpdateStatus(ctx, def, metav1.UpdateOptions{}); err != nil {
 		return err
 	}
-	logger.V(4).Info("ScopeDefinition updated with new status.namespaces configuration")
+	logger.V(4).Info("Scope updated with new status.namespaces configuration")
 	return nil
 }

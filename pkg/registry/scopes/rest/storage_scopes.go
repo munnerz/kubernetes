@@ -24,7 +24,7 @@ import (
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/scopes"
 	scopesv1alpha1 "k8s.io/kubernetes/pkg/apis/scopes/v1alpha1"
-	scopedefinitionstore "k8s.io/kubernetes/pkg/registry/scopes/scopedefinition/storage"
+	scopestore "k8s.io/kubernetes/pkg/registry/scopes/scope/storage"
 )
 
 type RESTStorageProvider struct{}
@@ -44,12 +44,12 @@ func (p RESTStorageProvider) NewRESTStorage(apiResourceConfigSource serverstorag
 func (p RESTStorageProvider) v1alpha1Storage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (map[string]rest.Storage, error) {
 	storage := map[string]rest.Storage{}
 
-	// scopedefinitions
-	if resource := "scopedefinitions"; apiResourceConfigSource.ResourceEnabled(scopesv1alpha1.SchemeGroupVersion.WithResource(resource)) {
-		if scopeDefinitionStorage, scopeDefinitionStatusStorage, err := scopedefinitionstore.NewREST(restOptionsGetter); err != nil {
+	// scopes
+	if resource := "scopes"; apiResourceConfigSource.ResourceEnabled(scopesv1alpha1.SchemeGroupVersion.WithResource(resource)) {
+		if scopeStorage, scopeDefinitionStatusStorage, err := scopestore.NewREST(restOptionsGetter); err != nil {
 			return nil, err
 		} else {
-			storage[resource] = scopeDefinitionStorage
+			storage[resource] = scopeStorage
 			storage[resource+"/status"] = scopeDefinitionStatusStorage
 		}
 	}

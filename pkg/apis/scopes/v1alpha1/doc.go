@@ -23,5 +23,5 @@ limitations under the License.
 
 // Package v1alpha1 contains APIs that configure apiserver request scopes,
 // used to provide filtered views of different namespaces by including
-// named namespaces within ScopeDefinitions.
+// named namespaces within Scopes.
 package v1alpha1 // import "k8s.io/kubernetes/pkg/apis/scopes/v1alpha1"

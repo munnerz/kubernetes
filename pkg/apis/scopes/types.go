@@ -20,34 +20,34 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ScopeDefinition is a definition of a mapping between a scope (name, value) tuple
+// Scope is a definition of a mapping between a scope (name, value) tuple
 // and a list of namespace names.
 // The metadata.namespace field is used to represent the scope name, and the
 // metadata.name field is used to represent the scope value.
-// For example, a ScopeDefinition in the namespace 'workspace' with name 'my-workspace'
+// For example, a Scope in the namespace 'workspace' with name 'my-workspace'
 // would correspond to the scope selector `workspace=my-workspace`.
 // A scopes generation field is used to uniquely identify a revision of a scope configuration.
-type ScopeDefinition struct {
+type Scope struct {
 	metav1.TypeMeta
 	// Standard object's metadata.
 	// The name must be of the form `<scope-name>:<scope-value>`, for example: `workspaces:my-workspace`.
 	// +optional
 	metav1.ObjectMeta
 
-	// Specification of the ScopeDefinition.
-	Spec ScopeDefinitionSpec
+	// Specification of the Scope.
+	Spec ScopeSpec
 
-	// Status of the ScopeDefinition.
-	Status ScopeDefinitionStatus
+	// Status of the Scope.
+	Status ScopeStatus
 }
 
-type ScopeDefinitionSpec struct {
+type ScopeSpec struct {
 	// Namespaces is a list of static & explicit namespace names to be included in the scope.
 	// +listType=set
 	Namespaces []string
 }
 
-type ScopeDefinitionStatus struct {
+type ScopeStatus struct {
 	// ScopeID is a unique identifier for this generation/epoch of mapping.
 	ScopeID string
 
@@ -101,12 +101,12 @@ type ServerScopeVersion struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ScopeDefinitionList is a collection of ScopeDefinition objects.
-type ScopeDefinitionList struct {
+// ScopeList is a collection of Scope objects.
+type ScopeList struct {
 	metav1.TypeMeta
 	// Standard object's metadata.
 	// +optional
 	metav1.ListMeta
 
-	Items []ScopeDefinition
+	Items []Scope
 }

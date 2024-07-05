@@ -23,42 +23,42 @@ import (
 	"k8s.io/kubernetes/pkg/apis/scopes"
 )
 
-// ValidateScopeDefinition validate the storage version object.
-func ValidateScopeDefinition(sv *scopes.ScopeDefinition) field.ErrorList {
+// ValidateScope validate the storage version object.
+func ValidateScope(sv *scopes.Scope) field.ErrorList {
 	var allErrs field.ErrorList
-	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&sv.ObjectMeta, false, ValidateScopeDefinitionName, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateScopeDefinitionSpec(sv.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&sv.ObjectMeta, false, ValidateScopeName, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validateScopeSpec(sv.Spec, field.NewPath("spec"))...)
 	return allErrs
 }
 
-// ValidateScopeDefinitionName is a ValidateNameFunc for storage version names
-func ValidateScopeDefinitionName(name string, prefix bool) []string {
+// ValidateScopeName is a ValidateNameFunc for storage version names
+func ValidateScopeName(name string, prefix bool) []string {
 	// todo: verify it is a valid string in a label key (when prefixed with 'scope.k8s.io/')
 	var allErrs []string
 	return allErrs
 }
 
-// ValidateScopeDefinitionUpdate tests if an update to a ScopeDefinition is valid.
-func ValidateScopeDefinitionUpdate(sv, oldSV *scopes.ScopeDefinition) field.ErrorList {
-	// no error since ScopeDefinitionSpec is an empty spec
+// ValidateScopeUpdate tests if an update to a Scope is valid.
+func ValidateScopeUpdate(sv, oldSV *scopes.Scope) field.ErrorList {
+	// no error since ScopeSpec is an empty spec
 	return field.ErrorList{}
 }
 
-// ValidateScopeDefinitionSpecUpdate tests if an update to a ScopeDefinitionSpec is valid.
-func ValidateScopeDefinitionSpecUpdate(sv, oldSV *scopes.ScopeDefinition) field.ErrorList {
+// ValidateScopeSpecUpdate tests if an update to a ScopeSpec is valid.
+func ValidateScopeSpecUpdate(sv, oldSV *scopes.Scope) field.ErrorList {
 	var allErrs field.ErrorList
-	allErrs = append(allErrs, validateScopeDefinitionSpec(sv.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateScopeSpec(sv.Spec, field.NewPath("spec"))...)
 	return allErrs
 }
 
-func validateScopeDefinitionSpec(ss scopes.ScopeDefinitionSpec, fldPath *field.Path) field.ErrorList {
+func validateScopeSpec(ss scopes.ScopeSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	// todo: verify namespace names in the list
 	return allErrs
 }
 
-// ValidateScopeDefinitionStatusUpdate tests if an update to a ScopeDefinitionStatus is valid.
-func ValidateScopeDefinitionStatusUpdate(sv, oldSV *scopes.ScopeDefinition) field.ErrorList {
+// ValidateScopeStatusUpdate tests if an update to a ScopeStatus is valid.
+func ValidateScopeStatusUpdate(sv, oldSV *scopes.Scope) field.ErrorList {
 	var allErrs field.ErrorList
 	fldPath := field.NewPath("status")
 	if !apiequality.Semantic.DeepEqual(sv.Status.Namespaces, oldSV.Status.Namespaces) {

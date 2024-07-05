@@ -29,7 +29,7 @@ import (
 
 type RequestScopingOptions struct {
 	// RemoteKubeConfigFile is the file to use to connect to a "normal" kube API server which hosts the
-	// ScopeDefinition.scopes.k8s.io endpoint for reading scope configurations.
+	// Scope.scopes.k8s.io endpoint for reading scope configurations.
 	RemoteKubeConfigFile string
 
 	ResourceStoreID         string
@@ -73,7 +73,7 @@ func (s *RequestScopingOptions) AddFlags(fs *pflag.FlagSet) {
 
 	fs.StringVar(&s.RemoteKubeConfigFile, "request-scope-kubeconfig", s.RemoteKubeConfigFile, ""+
 		"kubeconfig file pointing at the 'core' kubernetes server with enough rights to read and update "+
-		"scopedefinitions.scopes.k8s.io. (requires '"+string(genericfeatures.RequestScoping)+"' feature gate")
+		"scopes.scopes.k8s.io. (requires '"+string(genericfeatures.RequestScoping)+"' feature gate")
 	fs.StringVar(&s.ResourceStoreID, "resource-store-id", s.ResourceStoreID, ""+
 		"identifier for the storage backend for resources which must be unique per set of aggregated apiservers")
 	fs.Var(&s.OverrideResourceStoreID, "override-resource-store-id", ""+
@@ -106,7 +106,7 @@ func (s *RequestScopingOptions) ApplyTo(config *server.Config, loopbackConfig *r
 	versionedInformers := informers.NewSharedInformerFactory(client, 0)
 
 	// build the resolver
-	scopeResolver, err := scope.NewScopeDefinitionResolver(config.APIServerID, storeMapper, client, versionedInformers.Scopes().V1alpha1().ScopeDefinitions())
+	scopeResolver, err := scope.NewScopeResolver(config.APIServerID, storeMapper, client, versionedInformers.Scopes().V1alpha1().Scopes())
 	if err != nil {
 		return fmt.Errorf("failed building scope resolver: %w", err)
 	}
@@ -159,27 +159,27 @@ func (s *RequestScopingOptions) getClient(clientConfig *rest.Config) (kubernetes
 
 const emptyResourcePrefix = "/_empty"
 
-var scopeDefinitionResource = scopesv1alpha1.Resource("scopedefinitions")
+var scopeResource = scopesv1alpha1.Resource("scopes")
 
-func newScopeDefinition() runtime.Object     { return &scopesinternal.ScopeDefinition{} }
-func newScopeDefinitionList() runtime.Object { return &scopesinternal.ScopeDefinitionList{} }
+func newScope() runtime.Object     { return &scopesinternal.Scope{} }
+func newScopeList() runtime.Object { return &scopesinternal.ScopeList{} }
 
 func newSimpleStoreMapper(defaultStoreID string, overrides map[schema.GroupResource]string, storageFactory serverstorage.StorageFactory) (scope.ResourceStoreMapper, error) {
 	storeConfigs := map[string]*storagebackend.ConfigForResource{
-		defaultStoreID: (storageFactory.Configs()[0]).ForResource(scopeDefinitionResource),
+		defaultStoreID: (storageFactory.Configs()[0]).ForResource(scopeResource),
 	}
 	for resource, storeID := range overrides {
 		config, err := storageFactory.NewConfig(resource, nil)
 		if err != nil {
 			return nil, err
 		}
-		storeConfigs[storeID] = config.ForResource(scopeDefinitionResource)
+		storeConfigs[storeID] = config.ForResource(scopeResource)
 	}
 
 	stores := make(map[string]storage.Interface)
 	var stops []func()
 	for storeID, config := range storeConfigs {
-		store, stop, err := factory.Create(*config, newScopeDefinition, newScopeDefinitionList, emptyResourcePrefix)
+		store, stop, err := factory.Create(*config, newScope, newScopeList, emptyResourcePrefix)
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +210,7 @@ func (r *simpleStoreMapper) CurrentResourceVersion(ctx context.Context, storeID 
 	if !ok {
 		return 0, fmt.Errorf("unrecognised store ID %q", storeID)
 	}
-	return storage.GetCurrentResourceVersionFromStorage(ctx, store, newScopeDefinitionList, emptyResourcePrefix, "ScopeDefinition")
+	return storage.GetCurrentResourceVersionFromStorage(ctx, store, newScopeList, emptyResourcePrefix, "Scope")
 }
 
 func (r *simpleStoreMapper) StoreForResource(resource schema.GroupResource) (string, error) {

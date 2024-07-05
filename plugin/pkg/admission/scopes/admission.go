@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // Package scopes contains an admission controller for automatically setting the status.scopeID field when
-// the status.namespaces field changes on ScopeDefinition objects.
+// the status.namespaces field changes on Scope objects.
 package scopes
 
 import (
@@ -32,36 +32,36 @@ import (
 )
 
 // PluginName indicates name of admission plugin.
-const PluginName = "ScopeDefinition"
+const PluginName = "Scope"
 
 // Register registers a plugin
 func Register(plugins *admission.Plugins) {
 	plugins.Register(PluginName, func(config io.Reader) (admission.Interface, error) {
-		return NewScopeDefinition(), nil
+		return NewScope(), nil
 	})
 }
 
-// ScopeDefinition is an implementation of admission.Interface.
+// Scope is an implementation of admission.Interface.
 // When an UPDATE is submitted to the scopedefinitions/status endpoint, it ensures the status.scopeID is updated
 // whenever the list of namespaces in status.namespaces has changed.
-type ScopeDefinition struct {
+type Scope struct {
 	*admission.Handler
 
 	versioner storage.Versioner
 }
 
-var _ admission.MutationInterface = &ScopeDefinition{}
+var _ admission.MutationInterface = &Scope{}
 
 // Admit makes an admission decision based on the request attributes
-func (r *ScopeDefinition) Admit(ctx context.Context, attributes admission.Attributes, o admission.ObjectInterfaces) error {
+func (r *Scope) Admit(ctx context.Context, attributes admission.Attributes, o admission.ObjectInterfaces) error {
 	// Only operate on the 'scopedefinitions/status' subresource.
 	if attributes.GetResource().Group != scopes.GroupName ||
 		attributes.GetResource().Resource != "scopedefinitions" ||
 		attributes.GetSubresource() != "status" {
 		return nil
 	}
-	oldObj, _ := attributes.GetOldObject().(*scopes.ScopeDefinition)
-	obj, _ := attributes.GetObject().(*scopes.ScopeDefinition)
+	oldObj, _ := attributes.GetOldObject().(*scopes.Scope)
+	obj, _ := attributes.GetObject().(*scopes.Scope)
 
 	// we must update status.scopeID if either the oldObj is not set (create on update on status endpoint?) or if the
 	// status.namespaces list has changed.
@@ -107,9 +107,9 @@ func buildMinimumResourceVersions(versioner storage.Versioner, ssvs []scopes.Ser
 	return minimumResourceVersions, nil
 }
 
-// NewScopeDefinition creates a new ScopeDefinition admission control handler
-func NewScopeDefinition() *ScopeDefinition {
-	return &ScopeDefinition{
+// NewScope creates a new Scope admission control handler
+func NewScope() *Scope {
+	return &Scope{
 		versioner: storage.APIObjectVersioner{},
 		Handler:   admission.NewHandler(admission.Update),
 	}

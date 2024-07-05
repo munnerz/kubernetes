@@ -27,27 +27,27 @@ import (
 	"k8s.io/kubernetes/pkg/printers"
 	printersinternal "k8s.io/kubernetes/pkg/printers/internalversion"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
-	"k8s.io/kubernetes/pkg/registry/scopes/scopedefinition"
+	"k8s.io/kubernetes/pkg/registry/scopes/scope"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
-// REST implements a RESTStorage for ScopeDefinitions
+// REST implements a RESTStorage for Scopes
 type REST struct {
 	*genericregistry.Store
 }
 
-// NewREST returns a RESTStorage object that will work against ScopeDefinitions.
+// NewREST returns a RESTStorage object that will work against Scopes.
 func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, error) {
 	store := &genericregistry.Store{
-		NewFunc:                   func() runtime.Object { return &scopes.ScopeDefinition{} },
-		NewListFunc:               func() runtime.Object { return &scopes.ScopeDefinitionList{} },
-		DefaultQualifiedResource:  scopes.Resource("scopedefinitions"),
-		SingularQualifiedResource: scopes.Resource("scopedefinition"),
+		NewFunc:                   func() runtime.Object { return &scopes.Scope{} },
+		NewListFunc:               func() runtime.Object { return &scopes.ScopeList{} },
+		DefaultQualifiedResource:  scopes.Resource("scopes"),
+		SingularQualifiedResource: scopes.Resource("scope"),
 
-		CreateStrategy:      scopedefinition.Strategy,
-		UpdateStrategy:      scopedefinition.Strategy,
-		DeleteStrategy:      scopedefinition.Strategy,
-		ResetFieldsStrategy: scopedefinition.Strategy,
+		CreateStrategy:      scope.Strategy,
+		UpdateStrategy:      scope.Strategy,
+		DeleteStrategy:      scope.Strategy,
+		ResetFieldsStrategy: scope.Strategy,
 
 		TableConvertor: printerstorage.TableConvertor{TableGenerator: printers.NewTableGenerator().With(printersinternal.AddHandlers)},
 	}
@@ -57,20 +57,20 @@ func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST, error) {
 	}
 
 	statusStore := *store
-	statusStore.UpdateStrategy = scopedefinition.StatusStrategy
-	statusStore.ResetFieldsStrategy = scopedefinition.StatusStrategy
+	statusStore.UpdateStrategy = scope.StatusStrategy
+	statusStore.ResetFieldsStrategy = scope.StatusStrategy
 
 	return &REST{store}, &StatusREST{store: &statusStore}, nil
 }
 
-// StatusREST implements the REST endpoint for changing the status of a ScopeDefinition.
+// StatusREST implements the REST endpoint for changing the status of a Scope.
 type StatusREST struct {
 	store *genericregistry.Store
 }
 
 // New creates a new CertificateSigningRequest object.
 func (r *StatusREST) New() runtime.Object {
-	return &scopes.ScopeDefinition{}
+	return &scopes.Scope{}
 }
 
 // Destroy cleans up resources on shutdown.

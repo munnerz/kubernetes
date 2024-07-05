@@ -46,8 +46,8 @@ var (
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&ScopeDefinition{},
-		&ScopeDefinitionList{},
+		&Scope{},
+		&ScopeList{},
 	)
 	return nil
 }
