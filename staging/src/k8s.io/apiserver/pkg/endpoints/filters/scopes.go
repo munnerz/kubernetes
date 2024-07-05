@@ -18,14 +18,15 @@ package filters
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
-	"k8s.io/apiserver/pkg/scopes"
+	"k8s.io/apiserver/pkg/scope"
 	"k8s.io/klog/v2"
-	"net/http"
-	"strings"
 )
 
 const (
@@ -42,18 +43,15 @@ func WithScope(handler http.Handler, negotiatedSerializer runtime.NegotiatedSeri
 
 // WithScopeResolver resolves the Scope in the request context to a set of namespaces and an identifier for the mapping.
 // It then overwrites the Scope value with the new resolved form.
-func WithScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http.Handler {
+func WithScopeResolver(handler http.Handler, resolver scope.Resolver) http.Handler {
 	return withScopeResolver(handler, resolver)
 }
 
 func withScope(handler http.Handler, negotiatedSerializer runtime.NegotiatedSerializer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		var ok bool
-		var err error
 		// extract the user specified scope values
-		scope := &scopes.Scope{}
-		scope.Name, scope.Value, req.URL.Path, ok, err = parseScope(req)
+		name, value, urlPath, ok, err := parseScope(req)
 		if err != nil {
 			responsewriters.ErrorNegotiated(apierrors.NewBadRequest(err.Error()), negotiatedSerializer, meta.SchemeGroupVersion, w, req)
 			klog.Errorf("Error - %s: %#v", err.Error(), req.RequestURI)
@@ -64,17 +62,17 @@ func withScope(handler http.Handler, negotiatedSerializer runtime.NegotiatedSeri
 			handler.ServeHTTP(w, req)
 			return
 		}
-
+		req.URL.Path = urlPath
 		// add the Scope to the context and pass along to the next handler
-		req = req.WithContext(scopes.WithScope(ctx, scope))
+		req = req.WithContext(scope.WithValue(ctx, scope.NewValue(name, value)))
 		handler.ServeHTTP(w, req)
 	})
 }
 
-func withScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http.Handler {
+func withScopeResolver(handler http.Handler, resolver scope.Resolver) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		scope, ok := scopes.ScopeFrom(ctx)
+		value, ok := scope.ValueFrom(ctx)
 		// fallthrough if no scope parameter specified
 		if !ok {
 			handler.ServeHTTP(w, req)
@@ -82,7 +80,7 @@ func withScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http
 		}
 
 		// resolve the scope query parameter to an actual Scope (including currently mapped namespaces)
-		scope, err := resolver.Resolve(scope.Name, scope.Value)
+		s, err := resolver.Resolve(ctx, value.Name(), value.Value())
 		if err != nil {
 			responsewriters.InternalError(w, req, fmt.Errorf("resolving scope to namespace set: %w", err))
 			klog.Errorf("Error - %s: %#v", err.Error(), req.RequestURI)
@@ -90,7 +88,7 @@ func withScopeResolver(handler http.Handler, resolver scopes.ScopeResolver) http
 		}
 
 		// add the Scope to the context and pass along to the next handler
-		req = req.WithContext(scopes.WithScope(ctx, scope))
+		req = req.WithContext(scope.WithScope(ctx, s))
 		handler.ServeHTTP(w, req)
 	})
 }

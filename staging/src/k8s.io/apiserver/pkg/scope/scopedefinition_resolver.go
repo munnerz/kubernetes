@@ -1,7 +1,8 @@
-package scopes
+package scope
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	scopesv1alpha1 "k8s.io/api/scopes/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -26,12 +27,12 @@ const (
 	controllerName = "request_scope_resolver"
 )
 
-// NewScopeDefinitionResolver creates a new ScopeResolver that resolves scopes to a list of
+// NewScopeDefinitionResolver creates a new Resolver that resolves scopes to a list of
 // namespaces by querying a lister for the currently configured mapping.
 func NewScopeDefinitionResolver(apiServerID string, storeMapper ResourceStoreMapper, clientset kubernetes.Interface, scopeDefinitionInformer scopesinformers.ScopeDefinitionInformer) (*DefaultScopeResolver, error) {
 	r := &DefaultScopeResolver{
 		apiServerID:           apiServerID,
-		scopes:                make(map[string]map[string]*Scope),
+		scopes:                make(map[string]map[string]*scope),
 		clientset:             clientset,
 		lister:                scopeDefinitionInformer.Lister(),
 		storeMapper:           storeMapper,
@@ -74,9 +75,9 @@ type DefaultScopeResolver struct {
 	// apiServerID is the identifier for this apiserver
 	apiServerID string
 
-	// map of scopeName->scopeValue->*Scope
+	// map of scopeName->scopeValue->*scope
 	scopesLock sync.RWMutex
-	scopes     map[string]map[string]*Scope
+	scopes     map[string]map[string]*scope
 
 	clientset   kubernetes.Interface
 	storeMapper ResourceStoreMapper
@@ -90,7 +91,8 @@ type DefaultScopeResolver struct {
 
 // Resolve converts a (name, value) pair for a scope into a Scope object by reading the scope
 // from the internally maintained mapping, mirrored from ScopeDefinition objects.
-func (r *DefaultScopeResolver) Resolve(name, value string) (*Scope, error) {
+func (r *DefaultScopeResolver) Resolve(ctx context.Context, name, value string) (Scope, error) {
+
 	return r.readScope(name, value)
 }
 
@@ -167,7 +169,7 @@ func (r *DefaultScopeResolver) process(ctx context.Context, key string) error {
 	}
 	// check if we already have an entry for this scope value
 	// don't need to acquire an RLock as we are the only writer
-	scope, ok := r.scopes[scopeName][scopeValue]
+	existingScope, ok := r.scopes[scopeName][scopeValue]
 	if !ok {
 		r.writeScope(scopeName, scopeValue, def)
 		logger.V(4).Info("New Scope configuration installed")
@@ -175,14 +177,14 @@ func (r *DefaultScopeResolver) process(ctx context.Context, key string) error {
 	}
 	// check if we need to update the scope (and expire the old one)
 	// don't need to acquire an RLock as we are the only writer
-	if scope.Identifier == def.Status.ScopeID {
+	if existingScope.Identifier() == def.Status.ScopeID {
 		// the identifier has not changed, so we have nothing more to do
 		return nil
 	}
 	// set a new scope in its place so new requests use the new mapping
 	newScope := r.writeScope(scopeName, scopeValue, def)
 	// expire the old Scope and set the new one
-	scope.expire()
+	existingScope.expire(errors.New("scope configuration changed"))
 	// todo: wait for all watchers to stop sending events?
 	// deep copy as we are about to modify the status.serverScopeVersions field
 	def = def.DeepCopy()
@@ -193,47 +195,49 @@ func (r *DefaultScopeResolver) process(ctx context.Context, key string) error {
 		if err != nil {
 			// if an error occurs, clear the existing stored scope, expire the new one and retry
 			r.writeScope(scopeName, scopeValue, nil)
-			newScope.expire()
+			// this message is tailored to existing 'watch' users so contains less detail
+			newScope.expire(fmt.Errorf("internal error"))
 			return fmt.Errorf("failed to fetch resourceVersion for store %q: %w", store, err)
 		}
 		SetServerScopeVersion(&def.Status, scopesv1alpha1.ServerScopeVersion{
 			APIServerID:     r.apiServerID,
 			StoreID:         store,
-			ScopeID:         newScope.Identifier,
+			ScopeID:         newScope.Identifier(),
 			ResourceVersion: strconv.FormatUint(rv, 10),
 		})
 	}
 	if _, err := r.clientset.ScopesV1alpha1().ScopeDefinitions().UpdateStatus(ctx, def, metav1.UpdateOptions{}); err != nil {
 		// if an error occurs, clear the existing stored scope, expire the new one and retry
 		r.writeScope(scopeName, scopeValue, nil)
-		newScope.expire()
+		// this message is tailored to existing 'watch' users so contains less detail
+		newScope.expire(fmt.Errorf("internal error"))
 		return fmt.Errorf("failed to update status for scopedefinition %q: %w", def.Name, err)
 	}
-	logger.V(4).Info("Updated Scope configuration", "old_scope_id", scope.Identifier)
+	logger.V(4).Info("Updated Scope configuration", "old_scope_id", existingScope.Identifier())
 	return nil
 }
 
-func (r *DefaultScopeResolver) writeScope(name, value string, def *scopesv1alpha1.ScopeDefinition) *Scope {
+func (r *DefaultScopeResolver) writeScope(name, value string, def *scopesv1alpha1.ScopeDefinition) *scope {
 	r.scopesLock.Lock()
 	defer r.scopesLock.Unlock()
 	clear := def == nil
 	// the new scope to be set in the store
-	scope := r.buildScope(def)
+	expiringScope := r.buildExpiringScope(def)
 	if _, ok := r.scopes[name]; !ok {
 		if clear {
 			return nil
 		}
-		r.scopes[name] = make(map[string]*Scope)
+		r.scopes[name] = make(map[string]*scope)
 	}
 	if clear {
 		delete(r.scopes[name], value)
 		return nil
 	}
-	r.scopes[name][value] = scope
-	return scope
+	r.scopes[name][value] = expiringScope
+	return expiringScope
 }
 
-func (r *DefaultScopeResolver) readScope(name, value string) (*Scope, error) {
+func (r *DefaultScopeResolver) readScope(name, value string) (*scope, error) {
 	r.scopesLock.RLock()
 	defer r.scopesLock.RUnlock()
 	values, ok := r.scopes[name]
@@ -247,30 +251,28 @@ func (r *DefaultScopeResolver) readScope(name, value string) (*Scope, error) {
 	return scope, nil
 }
 
-func (r *DefaultScopeResolver) buildScope(def *scopesv1alpha1.ScopeDefinition) *Scope {
+func (r *DefaultScopeResolver) buildExpiringScope(def *scopesv1alpha1.ScopeDefinition) *scope {
 	if def == nil {
 		return nil
 	}
 	parts := strings.SplitN(def.Name, ":", 2)
 	scopeName, scopeValue := parts[0], parts[1]
-	return &Scope{
-		Name:                   scopeName,
-		Value:                  scopeValue,
-		Namespaces:             def.Status.Namespaces,
-		Identifier:             def.Status.ScopeID,
-		minimumResourceVersion: r.minimumResourceVersion,
-		expired:                false,
-		expiredCh:              make(chan struct{}),
+	return &scope{
+		ScopeValue: NewValue(scopeName, scopeValue),
+		namespaces: def.Status.Namespaces,
+		identifier: def.Status.ScopeID,
+		current:    true,
+		expiredCh:  new(chan struct{}),
 	}
 }
 
-func (r *DefaultScopeResolver) minimumResourceVersion(scope *Scope, resource schema.GroupResource) (uint64, error) {
+func (r *DefaultScopeResolver) minimumResourceVersion(scope Scope, resource schema.GroupResource) (uint64, error) {
 	// todo: optimise this function to return as quick as possible as it will be called very frequently
 	storeID, err := r.storeMapper.StoreForResource(resource)
 	if err != nil {
 		return 0, err
 	}
-	def, err := r.lister.Get(scope.DefinitionName())
+	def, err := r.lister.Get(DefinitionName(scope))
 	if err != nil {
 		return 0, err
 	}
@@ -289,4 +291,4 @@ func (r *DefaultScopeResolver) minimumResourceVersion(scope *Scope, resource sch
 	return 0, fmt.Errorf("no minimum resource version entry for store %q found", storeID)
 }
 
-var _ ScopeResolver = &DefaultScopeResolver{}
+var _ Resolver = &DefaultScopeResolver{}

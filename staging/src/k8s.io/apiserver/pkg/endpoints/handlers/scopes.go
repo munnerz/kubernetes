@@ -6,14 +6,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/selection"
-	"k8s.io/apiserver/pkg/scopes"
+	"k8s.io/apiserver/pkg/scope"
 )
 
 var (
 	namespaceGroupResource = corev1.Resource("namespaces")
 )
 
-func scopingLabelSelector(s *scopes.Scope, resource schema.GroupResource, selector labels.Selector) (labels.Selector, error) {
+func scopingLabelSelector(s scope.Scope, resource schema.GroupResource, selector labels.Selector) (labels.Selector, error) {
 	if selector == nil {
 		selector = labels.NewSelector()
 	}
@@ -21,7 +21,7 @@ func scopingLabelSelector(s *scopes.Scope, resource schema.GroupResource, select
 	if resource == namespaceGroupResource {
 		key = "kubernetes.io/metadata.name"
 	}
-	req, err := labels.NewRequirement(key, selection.In, s.Namespaces)
+	req, err := labels.NewRequirement(key, selection.In, s.Namespaces())
 	if err != nil {
 		return nil, errors.NewInternalError(err)
 	}

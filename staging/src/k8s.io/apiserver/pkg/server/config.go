@@ -59,7 +59,7 @@ import (
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/scopes"
+	"k8s.io/apiserver/pkg/scope"
 	"k8s.io/apiserver/pkg/server/dynamiccertificates"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	genericfilters "k8s.io/apiserver/pkg/server/filters"
@@ -318,7 +318,7 @@ type Config struct {
 
 	// ScopeResolver, if set, is used to resolve 'scope' query parameters
 	// into sets of namespaces that a request should apply to.
-	ScopeResolver scopes.ScopeResolver
+	ScopeResolver scope.Resolver
 }
 
 type RecommendedConfig struct {

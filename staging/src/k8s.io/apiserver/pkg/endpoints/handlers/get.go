@@ -41,7 +41,7 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/apiserver/pkg/scopes"
+	apiserverscope "k8s.io/apiserver/pkg/scope"
 	"k8s.io/apiserver/pkg/server/routine"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/tracing"
@@ -254,17 +254,19 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 		}
 
 		// Apply request scopes if the feature is enabled.
+		var apiserverScope apiserverscope.Scope
 		if utilfeature.DefaultFeatureGate.Enabled(features.RequestScoping) {
+			var found bool
 			// handle scoped requests by converting them to LabelSelectors
-			if s, found := scopes.ScopeFrom(ctx); found {
-				if s.Identifier == "" {
+			if apiserverScope, found = apiserverscope.ScopeFrom(ctx); found {
+				if apiserverScope.Identifier() == "" {
 					// implies the scope hasn't been resolved, this shouldn't ever be reached as it should be caught
 					// by the http filter already
 					scope.err(errors.NewInternalError(fmt.Errorf("no scope value set on request context")), w, req)
 					return
 				}
 
-				opts.LabelSelector, err = scopingLabelSelector(s, scope.Resource.GroupResource(), opts.LabelSelector)
+				opts.LabelSelector, err = scopingLabelSelector(apiserverScope, scope.Resource.GroupResource(), opts.LabelSelector)
 				if err != nil {
 					scope.err(errors.NewInternalError(err), w, req)
 					return
@@ -303,7 +305,7 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 				scope.err(err, w, req)
 				return
 			}
-			handler, err := serveWatchHandler(watcher, scope, outputMediaType, req, w, timeout, metrics.CleanListScope(ctx, &opts), emptyVersionedList)
+			handler, err := serveWatchHandler(watcher, scope, outputMediaType, req, w, timeout, metrics.CleanListScope(ctx, &opts), emptyVersionedList, opts.ResourceVersion)
 			if err != nil {
 				scope.err(err, w, req)
 				return

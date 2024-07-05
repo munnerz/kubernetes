@@ -1,4 +1,4 @@
-package scopes
+package scope
 
 import (
 	scopesv1alpha1 "k8s.io/api/scopes/v1alpha1"

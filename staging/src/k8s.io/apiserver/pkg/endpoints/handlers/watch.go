@@ -20,12 +20,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"k8s.io/apiserver/pkg/scope"
 	"net/http"
 	"time"
 
 	"golang.org/x/net/websocket"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/httpstream/wsstream"
@@ -64,7 +66,7 @@ func (w *realTimeoutFactory) TimeoutCh() (<-chan time.Time, func() bool) {
 
 // serveWatchHandler returns a handle to serve a watch response.
 // TODO: the functionality in this method and in WatchServer.Serve is not cleanly decoupled.
-func serveWatchHandler(watcher watch.Interface, scope *RequestScope, mediaTypeOptions negotiation.MediaTypeOptions, req *http.Request, w http.ResponseWriter, timeout time.Duration, metricsScope string, initialEventsListBlueprint runtime.Object) (http.Handler, error) {
+func serveWatchHandler(watcher watch.Interface, scope *RequestScope, mediaTypeOptions negotiation.MediaTypeOptions, req *http.Request, w http.ResponseWriter, timeout time.Duration, metricsScope string, initialEventsListBlueprint runtime.Object, initialResourceVersion string) (http.Handler, error) {
 	options, err := optionsForTransform(mediaTypeOptions, req)
 	if err != nil {
 		return nil, err
@@ -151,7 +153,8 @@ func serveWatchHandler(watcher watch.Interface, scope *RequestScope, mediaTypeOp
 		TimeoutFactory:       &realTimeoutFactory{timeout},
 		ServerShuttingDownCh: serverShuttingDownCh,
 
-		metricsScope: metricsScope,
+		metricsScope:               metricsScope,
+		initialResourceVersionFunc: nil,
 	}
 
 	if wsstream.IsWebSocketRequest(req) {
@@ -185,7 +188,8 @@ type WatchServer struct {
 	TimeoutFactory       TimeoutFactory
 	ServerShuttingDownCh <-chan struct{}
 
-	metricsScope string
+	metricsScope               string
+	initialResourceVersionFunc func(rv string)
 }
 
 // HandleHTTP serves a series of encoded events via HTTP with Transfer-Encoding: chunked.
@@ -229,6 +233,16 @@ func (s *WatchServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 	ch := s.Watching.ResultChan()
 	done := req.Context().Done()
 
+	// We have to block on _something_, so create a dummy channel that always exits when this method returns.
+	scopeCh := make(chan struct{})
+	defer close(scopeCh)
+	// This will be replaced with the real expiry channel if the request is actually scoped.
+	var scopeExpiryChan <-chan struct{} = scopeCh
+	scope, isScoped := scope.ScopeFrom(req.Context())
+	if utilfeature.DefaultFeatureGate.Enabled(features.RequestScoping) && isScoped {
+		scopeExpiryChan = scope.Expired()
+		// todo: run a check to see if the minimum scope version has changed
+	}
 	for {
 		select {
 		case <-s.ServerShuttingDownCh:
@@ -242,6 +256,20 @@ func (s *WatchServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		case <-done:
 			return
+		case <-scopeExpiryChan:
+			errObj := errors.NewResourceExpired("scope mapping expired").ErrStatus
+			event := watch.Event{
+				Type:   watch.Error,
+				Object: &errObj,
+			}
+			if err := watchEncoder.Encode(event); err != nil {
+				utilruntime.HandleError(err)
+				// client disconnect.
+				return
+			}
+			// we won't be sending any more data after this, so flush now
+			flusher.Flush()
+			return
 		case <-timeoutCh:
 			return
 		case event, ok := <-ch:
@@ -250,7 +278,7 @@ func (s *WatchServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			metrics.WatchEvents.WithContext(req.Context()).WithLabelValues(kind.Group, kind.Version, kind.Kind).Inc()
-			isWatchListLatencyRecordingRequired := shouldRecordWatchListLatency(event)
+			initialRV, isWatchListLatencyRecordingRequired := shouldRecordWatchListLatency(event)
 
 			if err := watchEncoder.Encode(event); err != nil {
 				utilruntime.HandleError(err)
@@ -262,6 +290,9 @@ func (s *WatchServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 				flusher.Flush()
 			}
 			if isWatchListLatencyRecordingRequired {
+				if initialRV != "" && s.initialResourceVersionFunc != nil {
+					s.initialResourceVersionFunc(initialRV)
+				}
 				metrics.RecordWatchListLatency(req.Context(), s.Scope.Resource, s.metricsScope)
 			}
 		}
@@ -347,9 +378,9 @@ func (w *websocketFramer) Write(p []byte) (int, error) {
 
 var _ io.Writer = &websocketFramer{}
 
-func shouldRecordWatchListLatency(event watch.Event) bool {
+func shouldRecordWatchListLatency(event watch.Event) (string, bool) {
 	if event.Type != watch.Bookmark || !utilfeature.DefaultFeatureGate.Enabled(features.WatchList) {
-		return false
+		return "", false
 	}
 	// as of today the initial-events-end annotation is added only to a single event
 	// by the watch cache and only when certain conditions are met
@@ -358,7 +389,12 @@ func shouldRecordWatchListLatency(event watch.Event) bool {
 	hasAnnotation, err := storage.HasInitialEventsEndBookmarkAnnotation(event.Object)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("unable to determine if the obj has the required annotation for measuring watchlist latency, obj %T: %v", event.Object, err))
-		return false
+		return "", false
 	}
-	return hasAnnotation
+	accessor, err := meta.CommonAccessor(event.Object)
+	if err != nil {
+		utilruntime.HandleError(fmt.Errorf("unable to determine resourceVersion of obj, obj %T: %v", event.Object, err))
+		return "", false
+	}
+	return accessor.GetResourceVersion(), hasAnnotation
 }

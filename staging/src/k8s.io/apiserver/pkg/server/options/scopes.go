@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	genericfeatures "k8s.io/apiserver/pkg/features"
-	"k8s.io/apiserver/pkg/scopes"
+	"k8s.io/apiserver/pkg/scope"
 	"k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	"k8s.io/apiserver/pkg/storage"
@@ -106,7 +106,7 @@ func (s *RequestScopingOptions) ApplyTo(config *server.Config, loopbackConfig *r
 	versionedInformers := informers.NewSharedInformerFactory(client, 0)
 
 	// build the resolver
-	scopeResolver, err := scopes.NewScopeDefinitionResolver(config.APIServerID, storeMapper, client, versionedInformers.Scopes().V1alpha1().ScopeDefinitions())
+	scopeResolver, err := scope.NewScopeDefinitionResolver(config.APIServerID, storeMapper, client, versionedInformers.Scopes().V1alpha1().ScopeDefinitions())
 	if err != nil {
 		return fmt.Errorf("failed building scope resolver: %w", err)
 	}
@@ -164,7 +164,7 @@ var scopeDefinitionResource = scopesv1alpha1.Resource("scopedefinitions")
 func newScopeDefinition() runtime.Object     { return &scopesinternal.ScopeDefinition{} }
 func newScopeDefinitionList() runtime.Object { return &scopesinternal.ScopeDefinitionList{} }
 
-func newSimpleStoreMapper(defaultStoreID string, overrides map[schema.GroupResource]string, storageFactory serverstorage.StorageFactory) (scopes.ResourceStoreMapper, error) {
+func newSimpleStoreMapper(defaultStoreID string, overrides map[schema.GroupResource]string, storageFactory serverstorage.StorageFactory) (scope.ResourceStoreMapper, error) {
 	storeConfigs := map[string]*storagebackend.ConfigForResource{
 		defaultStoreID: (storageFactory.Configs()[0]).ForResource(scopeDefinitionResource),
 	}
@@ -225,4 +225,4 @@ func (r *simpleStoreMapper) Stop() {
 	r.stop()
 }
 
-var _ scopes.ResourceStoreMapper = &simpleStoreMapper{}
+var _ scope.ResourceStoreMapper = &simpleStoreMapper{}
