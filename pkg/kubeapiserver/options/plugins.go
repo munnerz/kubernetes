@@ -44,6 +44,7 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/nodetaint"
 	"k8s.io/kubernetes/plugin/pkg/admission/podnodeselector"
 	"k8s.io/kubernetes/plugin/pkg/admission/podtolerationrestriction"
+	"k8s.io/kubernetes/plugin/pkg/admission/podtopology"
 	podpriority "k8s.io/kubernetes/plugin/pkg/admission/priority"
 	"k8s.io/kubernetes/plugin/pkg/admission/runtimeclass"
 	"k8s.io/kubernetes/plugin/pkg/admission/security/podsecurity"
@@ -91,6 +92,7 @@ var AllOrderedPlugins = []string{
 	certsubjectrestriction.PluginName,       // CertificateSubjectRestriction
 	defaultingressclass.PluginName,          // DefaultIngressClass
 	denyserviceexternalips.PluginName,       // DenyServiceExternalIPs
+	podtopology.PluginName,                  // PodTopology
 
 	// new admission plugins should generally be inserted above here
 	// webhook, resourcequota, and deny plugins must go at the end
@@ -135,6 +137,7 @@ func RegisterAllAdmissionPlugins(plugins *admission.Plugins) {
 	certsigning.Register(plugins)
 	ctbattest.Register(plugins)
 	certsubjectrestriction.Register(plugins)
+	podtopology.Register(plugins)
 }
 
 // DefaultOffAdmissionPlugins get admission plugins off by default for kube-apiserver.
@@ -159,6 +162,7 @@ func DefaultOffAdmissionPlugins() sets.Set[string] {
 		certsubjectrestriction.PluginName,       // CertificateSubjectRestriction
 		defaultingressclass.PluginName,          // DefaultIngressClass
 		podsecurity.PluginName,                  // PodSecurity
+		podtopology.PluginName,                  // PodTopology, only active when feature gate PodTopology is enabled.
 		validatingadmissionpolicy.PluginName,    // ValidatingAdmissionPolicy, only active when feature gate ValidatingAdmissionPolicy is enabled
 	)
 
