@@ -957,6 +957,14 @@ const (
 	//
 	// Enables the image volume source.
 	ImageVolume featuregate.Feature = "ImageVolume"
+
+	// owner: @munnerz
+	// kep: https://kep.k8s.io/4742
+	// alpha: v1.32
+	//
+	// Enables the PodTopology admission plugin to automatically set topology labels on pods
+	// when they are scheduled to Nodes.
+	PodTopology featuregate.Feature = "PodTopology"
 )
 
 func init() {
@@ -1071,4 +1079,6 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 	StorageNamespaceIndex: {Default: true, PreRelease: featuregate.Beta},
 
 	RecursiveReadOnlyMounts: {Default: true, PreRelease: featuregate.Beta},
+
+	PodTopology: {Default: false, PreRelease: featuregate.Alpha},
 }
