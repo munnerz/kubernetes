@@ -29,6 +29,7 @@ import (
 	certsigning "k8s.io/kubernetes/plugin/pkg/admission/certificates/signing"
 	certsubjectrestriction "k8s.io/kubernetes/plugin/pkg/admission/certificates/subjectrestriction"
 	"k8s.io/kubernetes/plugin/pkg/admission/defaulttolerationseconds"
+	"k8s.io/kubernetes/plugin/pkg/admission/podtopology"
 	"k8s.io/kubernetes/plugin/pkg/admission/serviceaccount"
 )
 
@@ -45,6 +46,7 @@ func DefaultOffAdmissionPlugins() sets.Set[string] {
 		certsigning.PluginName,               // CertificateSigning
 		ctbattest.PluginName,                 // ClusterTrustBundleAttest
 		certsubjectrestriction.PluginName,    // CertificateSubjectRestriction
+		podtopology.PluginName,               // PodTopology, only active when feature gate PodTopology is enabled.
 		validatingadmissionpolicy.PluginName, // ValidatingAdmissionPolicy, only active when feature gate ValidatingAdmissionPolicy is enabled
 	)
 

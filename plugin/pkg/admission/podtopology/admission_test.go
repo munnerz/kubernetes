@@ -148,8 +148,10 @@ func TestPodTopology(t *testing.T) {
 				},
 				Target: *target,
 			}
-			err = admissiontesting.WithReinvocationTesting(t, handler).
-				Admit(context.TODO(), admission.NewAttributesRecord(binding, nil, api.Kind("Binding").WithVersion("version"), pod.Namespace, pod.Name, api.Resource("pods").WithVersion("version"), "binding", admission.Create, &metav1.CreateOptions{}, false, nil), nil)
+			if err := admissiontesting.WithReinvocationTesting(t, handler).
+				Admit(context.TODO(), admission.NewAttributesRecord(binding, nil, api.Kind("Binding").WithVersion("version"), pod.Namespace, pod.Name, api.Resource("pods").WithVersion("version"), "binding", admission.Create, &metav1.CreateOptions{}, false, nil), nil); err != nil {
+				t.Errorf("failed running admission plugin: %v", err)
+			}
 			updatedBindingLabels := binding.Labels
 			if !apiequality.Semantic.DeepEqual(updatedBindingLabels, test.expectedBindingLabels) {
 				t.Errorf("Unexpected label values: %v", cmp.Diff(updatedBindingLabels, test.expectedBindingLabels))

@@ -1079,6 +1079,4 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 	StorageNamespaceIndex: {Default: true, PreRelease: featuregate.Beta},
 
 	RecursiveReadOnlyMounts: {Default: true, PreRelease: featuregate.Beta},
-
-	PodTopology: {Default: false, PreRelease: featuregate.Alpha},
 }

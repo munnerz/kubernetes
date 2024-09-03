@@ -117,7 +117,7 @@ func (p *Plugin) Admit(ctx context.Context, a admission.Attributes, o admission.
 
 	node, err := p.nodeLister.Get(binding.Target.Name)
 	if err != nil {
-		// Ignore NotFound errors to avoid risking breaking compatability/behaviour.
+		// Ignore NotFound errors to avoid risking breaking compatibility/behaviour.
 		if apierrors.IsNotFound(err) {
 			return nil
 		}
@@ -159,6 +159,30 @@ func (p *Plugin) Admit(ctx context.Context, a admission.Attributes, o admission.
 	return nil
 }
 
+func (p *Plugin) isTopologyLabel(key string) bool {
+	// First check explicit label keys.
+	if p.labels.Has(key) {
+		return true
+	}
+	// Check the domain portion of the label key, if present
+	domain, _, hasDomain := strings.Cut(key, "/")
+	if !hasDomain {
+		// fast-path if there is no / separator
+		return false
+	}
+	if p.domains.Has(domain) {
+		// check for explicit domains to copy
+		return true
+	}
+	for _, suffix := range p.suffixes.UnsortedList() {
+		// check if the domain has one of the suffixes that are to be copied
+		if strings.HasSuffix(domain, suffix) {
+			return true
+		}
+	}
+	return false
+}
+
 func shouldIgnore(a admission.Attributes) bool {
 	resource := a.GetResource().GroupResource()
 	if resource != api.Resource("pods") {
@@ -176,29 +200,5 @@ func shouldIgnore(a admission.Attributes) bool {
 		return true
 	}
 
-	return false
-}
-
-func (w *Plugin) isTopologyLabel(key string) bool {
-	// First check explicit label keys.
-	if w.labels.Has(key) {
-		return true
-	}
-	// Check the domain portion of the label key, if present
-	domain, _, hasDomain := strings.Cut(key, "/")
-	if !hasDomain {
-		// fast-path if there is no / separator
-		return false
-	}
-	if w.domains.Has(domain) {
-		// check for explicit domains to copy
-		return true
-	}
-	for _, suffix := range w.suffixes.UnsortedList() {
-		// check if the domain has one of the suffixes that are to be copied
-		if strings.HasSuffix(domain, suffix) {
-			return true
-		}
-	}
 	return false
 }
