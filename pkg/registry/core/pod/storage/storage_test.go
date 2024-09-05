@@ -681,7 +681,7 @@ func TestEtcdCreateWithContainersNotFound(t *testing.T) {
 	}
 
 	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.32"))
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, kubefeatures.PodTopology, true)
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, kubefeatures.SetPodTopologyLabels, true)
 	// Suddenly, a wild scheduler appears:
 	_, err = bindingStorage.Create(ctx, "foo", &api.Binding{
 		ObjectMeta: metav1.ObjectMeta{

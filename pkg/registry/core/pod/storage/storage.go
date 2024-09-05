@@ -243,7 +243,7 @@ func (r *BindingREST) setPodHostAndAnnotations(ctx context.Context, podUID types
 		for k, v := range annotations {
 			pod.Annotations[k] = v
 		}
-		if utilfeature.DefaultFeatureGate.Enabled(kubefeatures.PodTopology) {
+		if utilfeature.DefaultFeatureGate.Enabled(kubefeatures.SetPodTopologyLabels) {
 			// If any labels are present on the Binding, copy them across to the Pod.
 			if len(labels) > 0 {
 				if pod.Labels == nil {

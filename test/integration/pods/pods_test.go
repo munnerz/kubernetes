@@ -56,7 +56,7 @@ func TestPodTopologyLabels(t *testing.T) {
 	// Enable the feature BEFORE starting the test server, as the admission plugin only checks feature gates
 	// on start up and not on each invocation at runtime.
 	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.32"))
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.PodTopology, true)
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SetPodTopologyLabels, true)
 	testPodTopologyLabels(t, tests)
 }
 
@@ -74,7 +74,7 @@ func TestPodTopologyLabels_FeatureDisabled(t *testing.T) {
 	// Disable the feature BEFORE starting the test server, as the admission plugin only checks feature gates
 	// on start up and not on each invocation at runtime.
 	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.32"))
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.PodTopology, false)
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SetPodTopologyLabels, false)
 	testPodTopologyLabels(t, tests)
 }
 

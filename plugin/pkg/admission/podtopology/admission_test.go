@@ -46,7 +46,7 @@ func TestPodTopology(t *testing.T) {
 		targetNodeLabels      map[string]string    // list of labels set on the node being bound to.
 		existingBindingLabels map[string]string    // list of labels that are set on the Binding prior to admission (aka by the client/scheduler)
 		expectedBindingLabels map[string]string    // list of labels that we expect to be set on the Binding after admission.
-		featureDisabled       bool                 // configure whether the PodTopology feature gate should be disabled.
+		featureDisabled       bool                 // configure whether the SetPodTopologyLabels feature gate should be disabled.
 	}{
 		{
 			name: "copies topology.k8s.io/zone and region labels to binding annotations",
@@ -98,7 +98,7 @@ func TestPodTopology(t *testing.T) {
 			},
 		},
 		{
-			name: "does nothing if the PodTopology feature gate is disabled",
+			name: "does nothing if the SetPodTopologyLabels feature gate is disabled",
 			targetNodeLabels: map[string]string{
 				"topology.k8s.io/zone":   "zone1",
 				"topology.k8s.io/region": "region1",
@@ -125,7 +125,7 @@ func TestPodTopology(t *testing.T) {
 				Spec:       corev1.PodSpec{},
 			}
 			featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, feature.DefaultFeatureGate, version.MustParse("1.32"))
-			featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, kubefeatures.PodTopology, !test.featureDisabled)
+			featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, kubefeatures.SetPodTopologyLabels, !test.featureDisabled)
 			mockClient := fake.NewSimpleClientset(namespace, node, pod)
 			handler, informerFactory, err := newHandlerForTest(mockClient)
 			if err != nil {

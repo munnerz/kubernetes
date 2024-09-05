@@ -35,7 +35,7 @@ import (
 )
 
 // PluginName is a string with the name of the plugin
-const PluginName = "PodTopology"
+const PluginName = "SetPodTopologyLabels"
 
 // Register registers a plugin
 func Register(plugins *admission.Plugins) {
@@ -76,7 +76,7 @@ var _ genericadmissioninitializer.WantsFeatures = &Plugin{}
 
 // InspectFeatureGates implements WantsFeatures.
 func (p *Plugin) InspectFeatureGates(featureGates featuregate.FeatureGate) {
-	p.enabled = featureGates.Enabled(features.PodTopology)
+	p.enabled = featureGates.Enabled(features.SetPodTopologyLabels)
 	p.inspectedFeatureGates = true
 }
 
