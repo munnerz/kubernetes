@@ -34,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/version"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
@@ -679,6 +680,7 @@ func TestEtcdCreateWithContainersNotFound(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.32"))
 	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, kubefeatures.PodTopology, true)
 	// Suddenly, a wild scheduler appears:
 	_, err = bindingStorage.Create(ctx, "foo", &api.Binding{

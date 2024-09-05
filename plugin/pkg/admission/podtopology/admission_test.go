@@ -20,6 +20,7 @@ import (
 	"context"
 	"github.com/google/go-cmp/cmp"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/util/version"
 	genericadmissioninitializer "k8s.io/apiserver/pkg/admission/initializer"
 	"k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/informers"
@@ -123,7 +124,8 @@ func TestPodTopology(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{Name: "testPod", Namespace: namespace.Name},
 				Spec:       corev1.PodSpec{},
 			}
-			featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultMutableFeatureGate, kubefeatures.PodTopology, !test.featureDisabled)
+			featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, feature.DefaultFeatureGate, version.MustParse("1.32"))
+			featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, kubefeatures.PodTopology, !test.featureDisabled)
 			mockClient := fake.NewSimpleClientset(namespace, node, pod)
 			handler, informerFactory, err := newHandlerForTest(mockClient)
 			if err != nil {
