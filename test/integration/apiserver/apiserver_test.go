@@ -52,10 +52,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/streaming"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/uuid"
+	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/endpoints/handlers"
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/storage/storagebackend"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	utilversion "k8s.io/apiserver/pkg/util/version"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
@@ -65,6 +68,7 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/pager"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/cmd/kube-apiserver/app/options"
 	kubeapiservertesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
@@ -814,6 +818,62 @@ func makeSecret(name string) *v1.Secret {
 		Data: map[string][]byte{
 			"key": []byte("value"),
 		},
+	}
+}
+
+func TestObjectNamespaceLabelSelector(t *testing.T) {
+	// Enable feature flags BEFORE setting up the apiserver.
+	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultMutableFeatureGate, version.MustParse("1.32"))
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultMutableFeatureGate, features.ObjectNamespaceLabelSelectors, true)
+
+	ctx, clientSet, _, tearDownFn := setup(t)
+	defer tearDownFn()
+
+	var namespaces []string
+	numNamespaces := 3
+	for i := 0; i < 3; i++ {
+		ns := framework.CreateNamespaceOrDie(clientSet, fmt.Sprintf("ns%d", i), t)
+		defer framework.DeleteNamespaceOrDie(clientSet, ns, t)
+
+		_, err := clientSet.CoreV1().Secrets(ns.Name).Create(ctx, makeSecret("foo"), metav1.CreateOptions{})
+		if err != nil {
+			t.Errorf("Couldn't create secret: %v", err)
+		}
+
+		namespaces = append(namespaces, ns.Name)
+	}
+
+	testcases := []struct {
+		selector        string
+		expectedSecrets int
+	}{
+		{
+			selector:        fmt.Sprintf("kubernetes.io/metadata.namespace in (%s)", strings.Join(namespaces, ",")),
+			expectedSecrets: numNamespaces,
+		},
+		{
+			selector:        fmt.Sprintf("kubernetes.io/metadata.namespace in (%s)", strings.Join([]string{namespaces[0], namespaces[1]}, ",")),
+			expectedSecrets: 2,
+		},
+		{
+			selector:        fmt.Sprintf("kubernetes.io/metadata.namespace in (%s)", strings.Join([]string{namespaces[0]}, ",")),
+			expectedSecrets: 1,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.selector, func(t *testing.T) {
+			opts := metav1.ListOptions{
+				LabelSelector: tc.selector,
+			}
+			secrets, err := clientSet.CoreV1().Secrets(metav1.NamespaceAll).List(ctx, opts)
+			if err != nil {
+				t.Errorf("%s: Unexpected error: %v", tc.selector, err)
+			}
+			if len(secrets.Items) != tc.expectedSecrets {
+				t.Errorf("%s: Unexpected number of secrets: %d, expected: %d", tc.selector, len(secrets.Items), tc.expectedSecrets)
+			}
+		})
 	}
 }
 

@@ -25,6 +25,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation"
@@ -1516,6 +1517,35 @@ func (e *Store) CompleteWithOptions(options *generic.StoreOptions) error {
 			attrFunc = storage.DefaultClusterScopedAttr
 		}
 	}
+
+	// Namespaced objects support labelSelector queries using `kubernetes.io/metadata.namespace` keys.
+	if utilfeature.DefaultFeatureGate.Enabled(features.ObjectNamespaceLabelSelectors) && isNamespaced {
+		origAttrFunc := attrFunc
+		// add `kubernetes.io/metadata.namespace` as a selectable label to all resources when they are evaluated by the storage layer.
+		// Because these are only set in the GetAttr func, this label won't actually be returned to clients.
+		attrFunc = func(obj runtime.Object) (labels labels.Set, fields fields.Set, err error) {
+			labels, fields, err = origAttrFunc(obj)
+			if err != nil {
+				return
+			}
+			metaObj, err := meta.Accessor(obj)
+			if err != nil {
+				// tolerate non metav1 objects to not break anything
+				return labels, fields, nil
+			}
+			// read the object's namespace
+			objNamespace := metaObj.GetNamespace()
+			if existing, exists := labels[corev1.LabelMetadataNamespace]; exists && existing != objNamespace {
+				klog.Warningf("Object '%s/%s' (type %s) sets invalid explicit %q label key to %q", metaObj.GetNamespace(), metaObj.GetName(), obj.GetObjectKind(), corev1.LabelMetadataNamespace, existing)
+			}
+			if labels == nil {
+				labels = map[string]string{}
+			}
+			labels[corev1.LabelMetadataNamespace] = objNamespace // overwrite the label value
+			return
+		}
+	}
+
 	if e.PredicateFunc == nil {
 		e.PredicateFunc = func(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
 			return storage.SelectionPredicate{

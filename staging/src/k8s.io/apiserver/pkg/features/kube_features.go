@@ -284,6 +284,14 @@ const (
 	// the 'nominalConcurrencyShares' field of the 'limited' section of a
 	// priority level.
 	ZeroLimitedNominalConcurrencyShares featuregate.Feature = "ZeroLimitedNominalConcurrencyShares"
+
+	// owner: @munnerz
+	// kep: n/a
+	// alpha: v1.32
+	//
+	// Enables support for label selector queries for namespaced objects using
+	// the 'kubernetes.io/metadata.namespace' label.
+	ObjectNamespaceLabelSelectors = "ObjectNamespaceLabelSelectors"
 )
 
 func init() {
@@ -450,6 +458,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 	ZeroLimitedNominalConcurrencyShares: {
 		{Version: version.MustParse("1.29"), Default: false, PreRelease: featuregate.Beta},
 		{Version: version.MustParse("1.30"), Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	},
+
+	ObjectNamespaceLabelSelectors: {
+		{Version: version.MustParse("1.32"), Default: false, PreRelease: featuregate.Alpha},
 	},
 }
 
