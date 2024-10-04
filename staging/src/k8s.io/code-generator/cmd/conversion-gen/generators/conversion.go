@@ -546,16 +546,20 @@ func getExplicitFromTypes(t *types.Type) []types.Name {
 	result := []types.Name{}
 	for _, path := range paths {
 		items := strings.Split(path, ".")
-		if len(items) != 2 {
+		// we expect to have at least one '.' in the type name (e.g. package.Type)
+		if len(items) < 2 {
 			klog.Errorf("Unexpected k8s:conversion-gen:explicit-from tag: %s", path)
 			continue
 		}
+		typeName := items[len(items)-1]
+		packageName := strings.Join(items[:len(items)-1], ".")
 		switch {
-		case items[0] == "net/url" && items[1] == "Values":
+		case packageName == "net/url" && typeName == "Values":
 		default:
-			klog.Fatalf("Not supported k8s:conversion-gen:explicit-from tag: %s", path)
+			klog.Warningf("Unrecognized k8s:conversion-gen:explicit-from tag: %s", path)
+			klog.Warningf("Assuming package %q with type name %q", packageName, typeName)
 		}
-		result = append(result, types.Name{Package: items[0], Name: items[1]})
+		result = append(result, types.Name{Package: packageName, Name: typeName})
 	}
 	return result
 }
@@ -718,7 +722,9 @@ func (g *genConversion) GenerateType(c *generator.Context, t *types.Type, w io.W
 		case inType.Name.Package == "net/url" && inType.Name.Name == "Values":
 			g.generateFromURLValues(inType, t, sw)
 		default:
-			klog.Errorf("Not supported input type: %#v", inType.Name)
+			g.generateConversion(t, inType, sw)
+			g.generateConversion(inType, t, sw)
+			klog.Warningf("Not supported input type: %#v", inType.Name)
 		}
 	}
 
