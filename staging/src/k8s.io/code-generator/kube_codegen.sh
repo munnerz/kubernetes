@@ -67,6 +67,7 @@ function kube::codegen::gen_helpers() {
     local boilerplate="${KUBE_CODEGEN_ROOT}/hack/boilerplate.go.txt"
     local v="${KUBE_VERBOSE:-0}"
     local extra_peers=()
+    local extra_dirs=()
 
     while [ "$#" -gt 0 ]; do
         case "$1" in
@@ -76,6 +77,10 @@ function kube::codegen::gen_helpers() {
                 ;;
             "--extra-peer-dir")
                 extra_peers+=("$2")
+                shift 2
+                ;;
+            "--extra-dir")
+                extra_dirs+=("$2")
                 shift 2
                 ;;
             *)
@@ -206,11 +211,16 @@ function kube::codegen::gen_helpers() {
         for arg in "${extra_peers[@]:+"${extra_peers[@]}"}"; do
             extra_peer_args+=("--extra-peer-dirs" "$arg")
         done
+        local extra_dir_args=()
+        for arg in "${extra_dirs[@]:+"${extra_dirs[@]}"}"; do
+            extra_dir_args+=("--extra-dirs" "$arg")
+        done
         "${gobin}/conversion-gen" \
             -v "${v}" \
             --output-file zz_generated.conversion.go \
             --go-header-file "${boilerplate}" \
             "${extra_peer_args[@]:+"${extra_peer_args[@]}"}" \
+            "${extra_dir_args[@]:+"${extra_dir_args[@]}"}" \
             "${input_pkgs[@]}"
     fi
 }
