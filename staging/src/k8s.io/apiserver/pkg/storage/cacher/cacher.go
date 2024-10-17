@@ -370,6 +370,19 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 		}
 	}
 
+	oldGetAttrFunc := config.GetAttrsFunc
+	config.GetAttrsFunc = func(obj runtime.Object) (label labels.Set, field fields.Set, err error) {
+		label, field, err = oldGetAttrFunc(obj)
+		if !field.Has("metadata.namespace") {
+			return
+		}
+		if label == nil {
+			label = make(labels.Set)
+		}
+		label["kubernetes.io/metadata.namespace"] = field.Get("metadata.namespace")
+		return
+	}
+
 	if config.Clock == nil {
 		config.Clock = clock.RealClock{}
 	}
