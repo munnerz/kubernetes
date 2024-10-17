@@ -40,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/apis/example"
@@ -2258,6 +2259,98 @@ func BenchmarkCacher_GetList(b *testing.B) {
 	}
 }
 
+// BenchmarkCacher_GetListWithNamespaceLabelSelector tests GetList performance across namespaces
+// with the ObjectNamespaceLabelSelector feature gate enabled.
+func BenchmarkCacher_GetListWithNamespaceLabelSelector(b *testing.B) {
+	testCases := []struct {
+		totalObjectNum       int
+		expectObjectNum      int
+		numPerNamespace      int
+		numNamespaceToSelect int
+	}{
+		{
+			totalObjectNum:       5000,
+			expectObjectNum:      250,
+			numPerNamespace:      50,
+			numNamespaceToSelect: 5,
+		},
+		{
+			totalObjectNum:       5000,
+			expectObjectNum:      500,
+			numPerNamespace:      100,
+			numNamespaceToSelect: 5,
+		},
+		{
+			totalObjectNum:       5000,
+			expectObjectNum:      1000,
+			numPerNamespace:      10,
+			numNamespaceToSelect: 100,
+		},
+	}
+	for _, tc := range testCases {
+		runBenchmark := func(enableFeature bool) func(*testing.B) {
+			return func(b *testing.B) {
+				// conditionally enable the feature.
+				featuregatetesting.SetFeatureGateDuringTest(b, utilfeature.DefaultFeatureGate, features.ObjectNamespaceLabelSelectors, enableFeature)
+
+				// create sample pods
+				fakePods := make([]example.Pod, tc.totalObjectNum, tc.totalObjectNum)
+				var toSelect []string
+				for i := range fakePods {
+					fakePods[i].Namespace = "default-" + strconv.Itoa(i%(tc.totalObjectNum/tc.numPerNamespace))
+					fakePods[i].Name = fmt.Sprintf("pod-%d", i)
+					fakePods[i].ResourceVersion = strconv.Itoa(i)
+
+					if i < tc.numNamespaceToSelect {
+						toSelect = append(toSelect, fakePods[i].Namespace)
+					}
+				}
+
+				// build test cacher
+				cacher, _, err := newTestCacher(newObjectStorage(fakePods))
+				if err != nil {
+					b.Fatalf("new cacher: %v", err)
+				}
+				defer cacher.Stop()
+
+				// prepare result and pred
+				req, err := labels.NewRequirement("kubernetes.io/metadata.namespace", selection.In, toSelect)
+				if err != nil {
+					b.Fatalf("building requirement: %v", err)
+				}
+				pred := storage.SelectionPredicate{
+					Label: labels.NewSelector().Add(*req),
+					Field: fields.Everything(),
+				}
+
+				// now we start benchmarking
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					result := &example.PodList{}
+					err = cacher.GetList(context.TODO(), "pods", storage.ListOptions{
+						Predicate:       pred,
+						Recursive:       true,
+						ResourceVersion: "12345",
+					}, result)
+					if err != nil {
+						b.Fatalf("GetList cache: %v", err)
+					}
+					if len(result.Items) != tc.expectObjectNum {
+						b.Fatalf("expect %d but got %d", tc.expectObjectNum, len(result.Items))
+					}
+				}
+			}
+		}
+
+		b.Run(
+			fmt.Sprintf("totalObjectNum=%d, expectObjectNum=%d, indexing=disabled", tc.totalObjectNum, tc.expectObjectNum),
+			runBenchmark(false))
+		b.Run(
+			fmt.Sprintf("totalObjectNum=%d, expectObjectNum=%d, indexing=enabled", tc.totalObjectNum, tc.expectObjectNum),
+			runBenchmark(true))
+	}
+}
+
 // TestWatchListIsSynchronisedWhenNoEventsFromStoreReceived makes sure that
 // a bookmark event will be delivered even if the cacher has not received an event.
 func TestWatchListIsSynchronisedWhenNoEventsFromStoreReceived(t *testing.T) {
@@ -2330,12 +2423,12 @@ func TestForgetWatcher(t *testing.T) {
 		schema.GroupResource{Resource: "pods"},
 		"1",
 	)
-	forgetWatcherFn = forgetWatcher(cacher, w, 0, namespacedName{}, "", false)
+	forgetWatcherFn = forgetWatcher(cacher, w, 0, []namespacedName{{}}, "", false)
 	addWatcher := func(w *cacheWatcher) {
 		cacher.Lock()
 		defer cacher.Unlock()
 
-		cacher.watchers.addWatcher(w, 0, namespacedName{}, "", false)
+		cacher.watchers.addWatcher(w, 0, []namespacedName{{}}, "", false)
 	}
 
 	addWatcher(w)
