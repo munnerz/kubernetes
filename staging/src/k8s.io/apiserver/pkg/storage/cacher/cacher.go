@@ -36,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/audit"
@@ -132,32 +133,39 @@ type indexedWatchers struct {
 	valueWatchers map[string]watchersMap
 }
 
-func (i *indexedWatchers) addWatcher(w *cacheWatcher, number int, scope namespacedName, value string, supported bool) {
+// addWatcher adds the given watcher to the index for the given scopes or trigger value.
+// If multiple scopes are provided, it is up to the caller to ensure no overlapping scopes are
+// given (which could lead to duplicate watch events being sent).
+func (i *indexedWatchers) addWatcher(w *cacheWatcher, number int, scopes []namespacedName, value string, supported bool) {
 	if supported {
 		if _, ok := i.valueWatchers[value]; !ok {
 			i.valueWatchers[value] = watchersMap{}
 		}
 		i.valueWatchers[value].addWatcher(w, number)
 	} else {
-		scopedWatchers, ok := i.allWatchers[scope]
-		if !ok {
-			scopedWatchers = watchersMap{}
-			i.allWatchers[scope] = scopedWatchers
+		for _, scope := range scopes {
+			scopedWatchers, ok := i.allWatchers[scope]
+			if !ok {
+				scopedWatchers = watchersMap{}
+				i.allWatchers[scope] = scopedWatchers
+			}
+			scopedWatchers.addWatcher(w, number)
 		}
-		scopedWatchers.addWatcher(w, number)
 	}
 }
 
-func (i *indexedWatchers) deleteWatcher(number int, scope namespacedName, value string, supported bool) {
+func (i *indexedWatchers) deleteWatcher(number int, scopes []namespacedName, value string, supported bool) {
 	if supported {
 		i.valueWatchers[value].deleteWatcher(number)
 		if len(i.valueWatchers[value]) == 0 {
 			delete(i.valueWatchers, value)
 		}
 	} else {
-		i.allWatchers[scope].deleteWatcher(number)
-		if len(i.allWatchers[scope]) == 0 {
-			delete(i.allWatchers, scope)
+		for _, scope := range scopes {
+			i.allWatchers[scope].deleteWatcher(number)
+			if len(i.allWatchers[scope]) == 0 {
+				delete(i.allWatchers, scope)
+			}
 		}
 	}
 }
@@ -549,22 +557,16 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 	}
 
 	// determine the namespace and name scope of the watch, first from the request, secondarily from the field selector
-	scope := namespacedName{}
-	if requestNamespace, ok := request.NamespaceFrom(ctx); ok && len(requestNamespace) > 0 {
-		scope.namespace = requestNamespace
-	} else if selectorNamespace, ok := pred.Field.RequiresExactMatch("metadata.namespace"); ok {
-		scope.namespace = selectorNamespace
-	}
-	if requestInfo, ok := request.RequestInfoFrom(ctx); ok && requestInfo != nil && len(requestInfo.Name) > 0 {
-		scope.name = requestInfo.Name
-	} else if selectorName, ok := pred.Field.RequiresExactMatch("metadata.name"); ok {
-		scope.name = selectorName
-	}
+	scopes := extractScopes(ctx, pred)
 
 	// for request like '/api/v1/watch/namespaces/*', set scope.namespace to empty.
 	// namespaces don't populate metadata.namespace in ObjFields.
-	if c.groupResource == coreNamespaceResource && len(scope.namespace) > 0 && scope.namespace == scope.name {
-		scope.namespace = ""
+	if c.groupResource == coreNamespaceResource {
+		for i, scope := range scopes {
+			if len(scope.namespace) > 0 && scope.namespace == scope.name {
+				scopes[i].namespace = ""
+			}
+		}
 	}
 
 	triggerValue, triggerSupported := "", false
@@ -668,10 +670,10 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 		}
 
 		// Update watcher.forget function once we can compute it.
-		watcher.forget = forgetWatcher(c, watcher, c.watcherIdx, scope, triggerValue, triggerSupported)
+		watcher.forget = forgetWatcher(c, watcher, c.watcherIdx, scopes, triggerValue, triggerSupported)
 		// Update the bookMarkAfterResourceVersion
 		watcher.setBookmarkAfterResourceVersion(bookmarkAfterResourceVersionFn())
-		c.watchers.addWatcher(watcher, c.watcherIdx, scope, triggerValue, triggerSupported)
+		c.watchers.addWatcher(watcher, c.watcherIdx, scopes, triggerValue, triggerSupported)
 		addedWatcher = true
 
 		// Add it to the queue only when the client support watch bookmarks.
@@ -691,6 +693,71 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 
 	go watcher.processInterval(ctx, cacheInterval, requiredResourceVersion)
 	return watcher, nil
+}
+
+// extractScopes returns a list of scopes used for indexing watch requests.
+// The returned list will always contain at least one item.
+func extractScopes(ctx context.Context, pred storage.SelectionPredicate) []namespacedName {
+	// determine the namespace and name scope of the watch, first from the request, secondarily from the field selector
+	scope := namespacedName{}
+	if requestNamespace, ok := request.NamespaceFrom(ctx); ok && len(requestNamespace) > 0 {
+		scope.namespace = requestNamespace
+	} else if selectorNamespace, ok := pred.Field.RequiresExactMatch("metadata.namespace"); ok {
+		scope.namespace = selectorNamespace
+	}
+	if requestInfo, ok := request.RequestInfoFrom(ctx); ok && requestInfo != nil && len(requestInfo.Name) > 0 {
+		scope.name = requestInfo.Name
+	} else if selectorName, ok := pred.Field.RequiresExactMatch("metadata.name"); ok {
+		scope.name = selectorName
+	}
+	// If any scoping was determined above, return the single scope as no others will be able to match.
+	if scope != (namespacedName{}) {
+		return []namespacedName{scope}
+	}
+	if !utilfeature.DefaultFeatureGate.Enabled(features.ObjectNamespaceLabelSelectors) {
+		// Nothing else to try if the feature gate is disabled, so return empty.
+		return []namespacedName{scope}
+	}
+	// Otherwise, attempt to build a set of scopes from the label selector values for metadata.namespace.
+	// todo: replace label selector use here with fieldSelectors supporting the 'In' operator.
+	reqs, selectable := pred.Label.Requirements()
+	if !selectable {
+		// Return the empty scope (i.e. 'all objects') to match previous behaviour.
+		return []namespacedName{scope}
+	}
+	// Build up a list of scopes to return.
+	var scopes []namespacedName
+	for _, req := range reqs {
+		// Check the requirements key.
+		switch req.Key() {
+		case "kubernetes.io/metadata.namespace":
+		default:
+			// we only index/optimise the special namespace label.
+			continue
+		}
+		// todo: handle choosing lowest-common-denominator scope when clients specify multiple metadata.namespace label requirements.
+		// Check the requirements' operator.
+		switch req.Operator() {
+		case selection.Equals:
+		case selection.DoubleEquals:
+		case selection.In:
+		default:
+			// we only index/optimise '=', '==' or 'In'.
+			continue
+		}
+		// Use the Set form of the values to avoid duplicate entries.
+		for _, val := range req.Values().UnsortedList() {
+			scopes = append(scopes, namespacedName{namespace: val})
+		}
+		// Break after the first encounter of a label selector with the namespace label to avoid adding
+		// the watcher to the same scope multiple times.
+		break
+	}
+	// Final case, handle case where there is no indexed label selector to return, so add to the 'global' scope.
+	if len(scopes) == 0 {
+		scopes = []namespacedName{{}} // return a slice with a single empty element
+	}
+	return scopes
 }
 
 // Get implements storage.Interface.
@@ -1342,7 +1409,7 @@ func (c *Cacher) Stop() {
 	c.stopWg.Wait()
 }
 
-func forgetWatcher(c *Cacher, w *cacheWatcher, index int, scope namespacedName, triggerValue string, triggerSupported bool) func(bool) {
+func forgetWatcher(c *Cacher, w *cacheWatcher, index int, scopes []namespacedName, triggerValue string, triggerSupported bool) func(bool) {
 	return func(drainWatcher bool) {
 		c.Lock()
 		defer c.Unlock()
@@ -1352,7 +1419,7 @@ func forgetWatcher(c *Cacher, w *cacheWatcher, index int, scope namespacedName, 
 		// It's possible that the watcher is already not in the structure (e.g. in case of
 		// simultaneous Stop() and terminateAllWatchers(), but it is safe to call stopLocked()
 		// on a watcher multiple times.
-		c.watchers.deleteWatcher(index, scope, triggerValue, triggerSupported)
+		c.watchers.deleteWatcher(index, scopes, triggerValue, triggerSupported)
 		c.stopWatcherLocked(w)
 	}
 }
